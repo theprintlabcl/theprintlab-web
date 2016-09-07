@@ -201,8 +201,8 @@ router.use('/init',function(req,res,next){
     signxml.setOpts("%commerceId%",597020000541);
     signxml.setOpts("%buyOrder%",orderid);
     signxml.setOpts("%sessionId%",sessionId);
-    signxml.setOpts("%returnURL%","https://printlab-onegorilla.herokuapp.com/webpay/return");
-    signxml.setOpts("%finalURL%","https://printlab-onegorilla.herokuapp.com/webpay/final");
+    signxml.setOpts("%returnURL%","https://app-theprintlab.herokuapp.com/webpay/return");
+    signxml.setOpts("%finalURL%","https://app-theprintlab.herokuapp.com/webpay/final");
     signxml.setOpts("%amount%",total);
     signxml.setOpts("%commerceCode%","597020000541");
 
