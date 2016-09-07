@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="http://service.wswebpay.webpay.transbank.com/">
+    <SOAP-ENV:Header>
+        <wsse:Security xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" SOAP-ENV:mustUnderstand="1">
+            <ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#"><ds:SignedInfo><ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/><ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/><ds:Reference URI="#12345"><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/><ds:DigestValue>kS8WfRUrqR5VGCsGEVy7tSagK0c=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue>Ua3rTJIvrL3kxbBlI6zGq/1MY2sSTmoxC0nNvcEiufPg8vEJ5CNx9kgEuyJ4V2UILuv5lGJQvD1WuqIpB1UHABJ36N43XQspYRyvOXxXkwQt5U0TrxY7zwfRi9Gth1aT5D1jul/ovrY09/3a5EOQhMnkxJka19FixpGTjp9XhM1gu00r9QoMHZuiH1nWzJcecSNfyoiOxgUtDfKSWhnX9Dxyuybu83s5iHBvQ4zTF+qDRjMdftpsmU30LjRKEHwgYknAzAPMbQdsyol/PZWTDUA+XDPoGDJ3bvaFpE6Nps4Ile7f1FAnTL1mGOQkRu44d/WRNwXY9nFvozoYahk6IQ==</ds:SignatureValue><ds:KeyInfo><wsse:SecurityTokenReference>
+                <ds:X509Data>
+                    <ds:X509IssuerSerial>
+                        <ds:X509IssuerName>C=CL,ST=Santiago,O=Transbank,L=Santiago,CN=597020000541,OU=CanalesRemotos,emailAddress=integradores@varios.cl</ds:X509IssuerName>
+                        <ds:X509SerialNumber>11088820064041996000</ds:X509SerialNumber>
+                    </ds:X509IssuerSerial>
+                </ds:X509Data>
+            </wsse:SecurityTokenReference></ds:KeyInfo></ds:Signature></wsse:Security>
+    </SOAP-ENV:Header>
+    <SOAP-ENV:Body xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" wsu:Id="12345">
+        <ns1:initTransaction>
+            <wsInitTransactionInput>
+                <wSTransactionType>TR_NORMAL_WS</wSTransactionType>
+                <commerceId>597020000541</commerceId>
+                <buyOrder>1001</buyOrder>
+                <sessionId>11111111111</sessionId>
+                <returnURL>http://onegorilla.cl</returnURL>
+                <finalURL>http://onegorilla.cl</finalURL>
+                <transactionDetails>
+                    <amount>1990</amount>
+                    <commerceCode>597020000541</commerceCode>
+                    <buyOrder>1001</buyOrder>
+                </transactionDetails>
+            </wsInitTransactionInput>
+        </ns1:initTransaction>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

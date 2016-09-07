@@ -1,0 +1,67 @@
+
+
+<!-- MAIN -->
+<div class="main">
+
+
+    <!-- TOP BAR -->
+    <header class="bar top-bar bar-solid">
+
+        <h1 class="bar-title">Datos Envío</h1>
+
+					<span class="bar-nav">
+						<a class="btn-icon" href="#/imprimir/datosenvio">
+                            <span class="icon ic-prev-circle"></span>
+                        </a>
+					</span>
+
+					<span class="bar-nav bar-nav-right" ng-show="validcontact===true">
+						<a class="btn-icon" ng-click="crearOrden()">
+                            <span class="icon ic-done-circle"></span>
+                        </a>
+					</span>
+
+    </header>
+
+
+    <!-- CONTENT -->
+    <div class="content">
+
+        <div class="form-group">
+            <input type="email" ng-model="email" class="form-control" placeholder="Email">
+            <span class="form-hint">Te enviaremos tu boleta a este email</span>
+        </div>
+
+        <div class="form-group">
+            <input type="phone" ng-model="phone" class="form-control" placeholder="Teléfono">
+            <span class="form-hint">Para ponernos en contacto contigo si es necesario</span>
+        </div>
+
+        <div class="form-group">
+
+            <div class="row">
+
+                <div class="col-md-6">
+                    <span class="title title-md switch-label">Para regalo?</span>
+                </div>
+
+                <div class="col-md-6 text-right">
+                    <!-- SWITCH -->
+								<span class="switch">
+									<input id="switch-1" name="switch-1" ng-model="gift" type="checkbox">
+									<label for="switch-1"></label>
+								</span>
+                </div>
+
+            </div><!-- /row -->
+
+        </div>
+
+        <div class="form-group" ng-show="gift == true">
+            <textarea limit-to="140" ng-model="message" class="form-control" rows="4" placeholder="Escribe un mensaje personal para la persona que recibirá este regalo (opcional)"></textarea>
+        </div>
+
+    </div><!-- /content -->
+
+
+</div><!-- /main -->

@@ -1,0 +1,154 @@
+
+
+<!-- TOP BAR -->
+<header class="bar top-bar bar-solid">
+
+    <h1 class="bar-title">Tu Compra</h1>
+
+				<span class="bar-nav">
+					<a class="btn-icon" href="#/imprimir/seleccion">
+                        <span class="icon ic-prev-circle"></span>
+                    </a>
+				</span>
+
+				<span class="bar-nav bar-nav-right">
+					<a class="btn-icon" href="#/imprimir/datosenvio">
+                        <span class="icon ic-done-circle"></span>
+                    </a>
+				</span>
+
+</header>
+
+
+<!-- MAIN -->
+<div class="main">
+
+    <div class="flex-align">
+
+        <div class="content">
+
+
+            <!-- CHART -->
+            <div class="chart">
+
+                <canvas id="chart" width="240" height="240" tc-chartjs-doughnut chart-data="grafico_data" chart-options="grafico_option"></canvas>
+
+                <div class="chart-content">
+                    <div>
+                        <span class="chart-value">{{price.total | miles}}<small>$</small></span>
+                        <span class="chart-title text-secondary">Total a pagar</span>
+                    </div>
+                </div>
+
+            </div><!-- /chart -->
+
+
+            <div class="chart-description clearfix">
+
+                <span class="centered">+</span>
+
+                <div class="chart-label chart-label-left">
+
+                    <div>
+
+                        <span class="chart-value chart-value-md">{{price.pics | miles}}<small>$</small></span>
+
+                        <span class="title title-xs text-success">{{qtypics | cerofill}} fotos</span>
+
+                        <a href="" class="btn-icon modal-open" ng-click='openModal("#modal-hint")' ng-show='warningpics===true'>
+                            <svg class="icon icon-sm color-warning" height="18" viewBox="0 0 24 24" width="18" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                            </svg>
+                        </a>
+
+                    </div>
+
+                </div><!-- /chart-label -->
+
+
+                <div class="chart-label">
+                    <span class="chart-value chart-value-md">{{price.shipping | miles}}<small>$</small></span>
+                    <span class="title title-xs text-info">Envío rápido</span>
+                </div><!-- /chart-label -->
+
+            </div><!-- /chart-description -->
+
+        </div><!-- /flex-align -->
+
+    </div><!-- /content -->
+
+</div><!-- /main -->
+
+
+<!-- BOTTOM BAR -->
+<footer class="bar bottom-bar bar-container">
+    <a href="" class="btn btn-full btn-secondary" ng-click='openModal("#modal-info")'>Más Información</a>
+</footer>
+
+
+</div><!-- /app-wrap -->
+
+
+<!-- MODAL HINT -->
+<div id="modal-hint" class="modal mfp-hide">
+
+    <div class="modal-window modal-info">
+
+
+        <div class="modal-content">
+            <h2 class="title title-sm">Hey psst...</h2>
+            <p>Aún puedes agregar {{availablepics | cerofill}} fotos más por el mismo precio!</p>
+        </div>
+
+
+        <div class="modal-actions">
+
+            <a href="" class="btn btn-default modal-close">Cerrar</a>
+
+        </div>
+
+    </div><!-- /modal-window -->
+
+</div><!-- /modal -->
+
+
+
+
+<!-- MODAL INFO -->
+<div id="modal-info" class="modal mfp-hide">
+
+    <div class="modal-window modal-info">
+
+        <div class="modal-title">
+            <h2 class="title title-sm">¿Cuáles son los costos?</h2>
+        </div>
+
+
+        <div class="modal-content">
+
+            <h3 class="title title-xs">Impresión</h3>
+
+            <ul>
+                <li>$5.000 por las primeras 20 fotos</li>
+                <li>$1.000 por cada 5 fotos adicionales</li>
+            </ul>
+
+            <br>
+
+            <h3 class="title title-xs">Envío</h3>
+
+            <p>$1.500 fijo por todas las fotos que quieras en tu dirección en Chile continental entre 4 y 7 días hábiles</p>
+
+        </div>
+
+
+        <div class="modal-actions">
+
+            <a href="" class="btn btn-default modal-close">Cerrar</a>
+
+        </div>
+
+    </div><!-- /modal-window -->
+
+</div><!-- /modal -->

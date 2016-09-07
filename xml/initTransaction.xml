@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="http://service.wswebpay.webpay.transbank.com/">
+    <SOAP-ENV:Header>
+        <wsse:Security xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" SOAP-ENV:mustUnderstand="1">
+        </wsse:Security>
+    </SOAP-ENV:Header>
+    <SOAP-ENV:Body xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+        <ns1:initTransaction>
+            <wsInitTransactionInput>
+                <wSTransactionType>%wSTransactionType%</wSTransactionType>
+                <commerceId>%commerceId%</commerceId>
+                <sessionId>%sessionId%</sessionId>
+                <returnURL>%returnURL%</returnURL>
+                <finalURL>%finalURL%</finalURL>
+                <transactionDetails>
+                    <amount>%amount%</amount>
+                    <commerceCode>%commerceCode%</commerceCode>
+                    <buyOrder>%buyOrder%</buyOrder>
+                </transactionDetails>
+            </wsInitTransactionInput>
+        </ns1:initTransaction>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

@@ -1,0 +1,85 @@
+
+
+
+<!-- TOP BAR -->
+<header class="bar top-bar bar-solid">
+
+    <h1 class="bar-title">Datos Envío</h1>
+
+				<span class="bar-nav">
+					<a class="btn-icon" href="#/imprimir/resumen">
+                        <span class="icon ic-prev-circle"></span>
+                    </a>
+				</span>
+
+				<span class="bar-nav bar-nav-right" ng-show="selectedaddress!=''">
+					<a class="btn-icon" href="#/imprimir/contacto">
+                        <span class="icon ic-done-circle"></span>
+                    </a>
+				</span>
+
+</header>
+
+
+<!-- MAIN -->
+<div class="main">
+
+
+    <!-- CONTENT -->
+    <div class="content">
+
+        <h1 class="title title-sm">Mis Direcciones</h1>
+
+        <section class="list full-width clearfix">
+
+
+            <!-- ITEM -->
+            <div class="list-item" ng-click="selectAddress(address._id);" ng-class="selectedaddress == address._id ? 'selected' : ''" ng-repeat="address in addresses">
+
+                <div class="list-item-content">
+
+                    <h3 class="title text-secondary">{{address.name}} {{address.last_name}}</h3>
+
+                    <span class="item-text">{{address.address_line1}} {{address.address_line2}}</span>
+
+                </div>
+
+                <svg class="icon icon-md color-primary item-icon-top icon-selected" height="36" viewBox="0 0 24 24" width="36" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M0 0h24v24H0z" fill="none"/>
+                    <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
+                </svg>
+
+                <div class="item-settings">
+
+                    <!-- DROPDOWN -->
+                    <div class="dropdown" ng-show="dropdownactive == address._id">
+                        <ul>
+                            <!-- <li><a href="#/imprimir/direccion/{{address._id}}">Editar</a></li> -->
+                            <li><a ng-click="deleteAddress(address._id,$index)">Eliminar</a></li>
+                        </ul>
+                    </div>
+
+                    <a ng-click="setDropdown(address._id)" class="btn-icon">
+                        <svg class="icon icon-md color-secondary" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M0 0h24v24H0z" fill="none"/>
+                            <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                        </svg>
+                    </a>
+
+                </div><!-- /item-settings -->
+
+            </div><!-- /list-item -->
+
+        </section>
+
+    </div><!-- /content -->
+
+</div><!-- /main -->
+
+
+<!-- BOTTOM BAR -->
+<footer class="bar bottom-bar bar-container">
+    <a href="#/imprimir/direccion" class="btn btn-full btn-secondary">
+        <span class="icon icon-sm ic-add"></span>
+    </a>
+</footer>

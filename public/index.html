@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es" ng-app="onegorillaApp">
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="language" content="es" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<meta name="description" content="La forma más sencilla de imprimir tus fotos desde tu smartphone y recibirlas por correo impresas en papel fotográfico en la puerta de tu casa." />
+	<meta name="keywords" content="fotos, impresion, papel fotografico" />
+	<meta name="author" content="OneGorilla" />
+	<link href="img/favicon.ico" rel="icon" />
+
+	<title>Inicio - The Printlab</title>
+
+	<!-- CSS -->
+	<link href="css/normalize.css" rel="stylesheet" />
+	<link href="css/main.css" rel="stylesheet" />
+	<link href="css/angular-loading.css" rel="stylesheet" />
+
+	<!-- APP -->
+	<script src="lib/jquery.min.js"></script>
+	<script src="lib/flickity.pkgd.min.js"></script>
+	<script src="lib/jquery.magnific-popup.min.js"></script>
+	<script src="lib/Chart.min.js"></script>
+	<script src="lib/angular.min.js"></script>
+	<script src="lib/angular-animate.min.js"></script>
+	<script src="lib/angular-cookies.min.js"></script>
+	<script src="lib/angular-route.min.js"></script>
+	<script src="lib/ng-file-upload.min.js"></script>
+	<script src="lib/ng-file-upload-shim.min.js"></script>
+	<script src="lib/tc-angular-chartjs.js"></script>
+	<script src="lib/angular-thumbnails.js"></script>
+	<script src="lib/spin.js"></script>
+	<script src="lib/angular-loading.min.js"></script>
+	<script src="lib/angular-file-reader.js"></script>
+	<script src="lib/angular-cropper.js"></script>
+	<script src="js/ngapp.js"></script>
+	<script src="js/controllers/home.js"></script>
+	<script src="js/controllers/imprimir.js"></script>
+	<script src="js/services.js"></script>
+
+	<!--JS-->
+	<script src="lib/modernizr.custom.js"></script>
+
+</head>
+
+<body dw-loading="loading" dw-loading-options="{text: ''}">
+
+	<div class="app-wrap {{appClass}}" ng-view></div>
+
+</body>
+
+</html>

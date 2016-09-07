@@ -1,0 +1,72 @@
+
+
+
+<!-- MAIN -->
+<div class="main">
+
+    <div class="flex-align">
+
+        <div class="content">
+
+            <div class="entry">
+
+                <h1>Comprobante de Pago Webpay</h1>
+
+                <p>Estimado cliente, se ha realizado de manera satisfactoria
+                    el pago de la boleta número <b>{{webpayJson.buyOrder}}</b>
+                    por un valor de <b>$ {{webpayJson.amount | miles}},</b> el cual ha sido cargado a su tarjeta bancaria.
+                </p>
+                <table class="BordeTablaSitio" width="450" cellpadding="2">
+                    <tr>
+                        <td class=TexTabColumnas>Monto Pagado</td>
+                        <td class=TexTabInforma>$ {{webpayJson.amount | miles}}</td>
+                    </tr>
+                    <tr>
+                        <td class=TexTabColumnas>Código de Autorización</td>
+                        <td class=TexTabInforma>{{webpayJson.authorizationCode}}</td>
+                    </tr>
+                    <tr>
+                        <td class=TexTabColumnas>Orden de Compra</td>
+                        <td class=TexTabInforma>{{webpayJson.buyOrder}}</td>
+                    </tr>
+                    <tr>
+                        <td class=TexTabColumnas>Tarjeta Bancaria</td>
+                        <td class=TexTabInforma>**************{{webpayJson.cardNumber}}</td>
+                    </tr>
+                    <tr>
+                        <td class=TexTabColumnas>Fecha de Transacción</td>
+                        <td class=TexTabInforma>{{webpayJson.transactionDateParse | date:'dd/MM/yyyy H:mma'}}</td>
+                    </tr>
+                    <tr>
+                        <td class=TexTabColumnas>Tipo de Pago</td>
+                        <td class=TexTabInforma>{{webpayJson.paymentTypeCode}}</td>
+                    </tr>
+                    <!--<tr>
+                        <td class=TexTabColumnas>N° de Cuotas</td>
+                        <td class=TexTabInforma>tbk_numero_cuotas</td>
+                    </tr>-->
+                </table>
+
+            </div><!-- /entry -->
+
+        </div><!-- /content -->
+
+    </div><!-- /flex-align -->
+
+
+</div><!-- /main -->
+
+
+<!-- BOTTOM BAR -->
+<footer class="bar bottom-bar">
+
+    <div class="bb-group">
+        <a class="btn-icon" href="#/imprimir/estamoslistos">
+            <svg class="icon" width="36px" height="36px" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
+                <path fill="#b6ce32" d="M18,3C9.7,3,3,9.7,3,18c0,8.3,6.7,15,15,15s15-6.7,15-15C33,9.7,26.3,3,18,3z M15.6,27l-2.1-2.1l6.9-6.9
+							l-6.9-6.9L15.6,9l9,9L15.6,27z"/>
+            </svg>
+        </a>
+    </div>
+
+</footer>

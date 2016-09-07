@@ -1,0 +1,58 @@
+
+<!-- MAIN -->
+<div class="main">
+
+    <!-- TOP BAR -->
+    <header class="bar top-bar">
+
+        <h1 class="bar-title bar-title-md text-left">Enviar fotos a:</h1>
+
+					<span class="bar-nav bar-nav-right">
+						<a class="btn-icon" href="#/imprimir/datosenvio">
+                            <span class="icon ic-cancel-circle"></span>
+                        </a>
+					</span>
+
+    </header>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+        <div class="form-group">
+            <input type="text" class="form-control" ng-model="direccion.name" placeholder="Nombre">
+        </div>
+
+        <div class="form-group">
+            <input type="text" class="form-control" ng-model="direccion.last_name" placeholder="Apellido">
+        </div>
+
+        <div class="form-group">
+            <textarea class="form-control" rows="2" ng-model="direccion.address_line1" placeholder="Dirección"></textarea>
+        </div>
+
+        <div class="form-group">
+            <select class="form-control" ng-change="loadProvincias()" ng-model="region_selected"
+                    ng-options="option.name for option in regiones track by option.region_id">
+                <option value="" disabled selected hidden>Región</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <select class="form-control" ng-change="loadComunas()" ng-model="provincia_selected"
+                    ng-options="option.name for option in provincias track by option.provincia_id">
+                <option value="" disabled selected hidden>Provincia</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <select class="form-control" ng-model="comuna_selected"
+                    ng-options="option.name for option in comunas track by option.comuna_id">
+                <option value="" disabled selected hidden>Comuna</option>
+            </select>
+        </div>
+
+        <button class="btn btn-primary btn-block" type="submit" ng-disabled="formvalid == false" ng-click="setDireccion()">Guardar</button>
+
+    </div><!-- /content -->
+
+</div><!-- /main -->

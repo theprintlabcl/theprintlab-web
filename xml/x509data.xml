@@ -1,0 +1,8 @@
+<wsse:SecurityTokenReference>
+    <ds:X509Data>
+        <ds:X509IssuerSerial>
+            <ds:X509IssuerName>%info%</ds:X509IssuerName>
+            <ds:X509SerialNumber>%serial%</ds:X509SerialNumber>
+        </ds:X509IssuerSerial>
+    </ds:X509Data>
+</wsse:SecurityTokenReference>

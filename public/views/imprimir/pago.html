@@ -1,0 +1,50 @@
+
+<!-- MAIN -->
+<div class="main">
+
+    <!-- TOP BAR -->
+    <header class="bar top-bar bar-solid">
+
+        <h1 class="bar-title">Modo de pago</h1>
+
+					<span class="bar-nav">
+						<a class="btn-icon" ng-show="order==false" href="#/imprimir/contacto">
+                            <span class="icon ic-prev-circle"></span>
+                        </a>
+					</span>
+
+    </header>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+        <a class="btn btn-lg btn-default btn-block" ng-click="pagoWebpay()">Webpay</a>
+        <a class="btn btn-lg btn-default btn-block modal-open" ng-click="pagoTransferencia()">Transferencia Bancaria</a>
+
+
+    </div><!-- /content -->
+
+</div><!-- /main -->
+
+
+<!-- MODAL TRANSFERENCIA -->
+<div id="modal-transfer" class="modal mfp-hide">
+
+    <div class="modal-window modal-info">
+
+
+        <div class="modal-content">
+            <h2 class="title title-sm">Pago con transferencia bancaria</h2>
+            <p>Luego de finalizar con tu pedido te enviaremos un email de confirmación con los datos para que nos hagas un depósito en nuestra cuenta de banco.</p>
+        </div>
+
+
+        <div class="modal-actions">
+
+            <a ng-click="pagoTransferenciaAceptar()" class="btn btn-default">Ok</a>
+
+        </div>
+
+    </div><!-- /modal-window -->
+
+</div><!-- /modal -->

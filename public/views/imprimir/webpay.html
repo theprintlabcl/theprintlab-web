@@ -1,0 +1,30 @@
+
+<!-- MAIN -->
+<div class="main">
+
+    <!-- TOP BAR -->
+    <header class="bar top-bar bar-solid">
+
+        <h1 class="bar-title">Webpay</h1>
+
+    </header>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+        <div>
+            Resumen de su compra
+            <ul>
+                <li>Orden de compra: {{order._id}}</li>
+                <li>Monto total: $ {{price.total | miles}}</li>
+            </ul>
+        </div>
+        <form action="{{webpay_url}}" method="post" ng-show="webpayResponse==true">
+            <input type="hidden" name="token_ws" value="{{webpay_token}}" />
+            <button type="submit" class="btn btn-lg btn-default btn-block">Pagar con Webpay</button>
+        </form>
+
+
+    </div><!-- /content -->
+
+</div><!-- /main -->

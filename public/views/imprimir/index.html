@@ -1,0 +1,101 @@
+
+
+<!-- TOP BAR -->
+<header class="bar top-bar bar-solid">
+
+    <h1 class="bar-title">{{qtypics | cerofill}}/{{maxqtypics}}</h1>
+
+				<span class="bar-nav">
+					<a class="btn-icon" href="#/">
+                        <span class="icon ic-prev-circle"></span>
+                    </a>
+				</span>
+
+				<span class="bar-nav bar-nav-right" ng-show="qtypics > 0">
+					<a class="btn-icon" href="#/imprimir/seleccion">
+                        <span class="icon ic-done-circle"></span>
+                    </a>
+				</span>
+
+</header>
+
+
+<!-- MAIN -->
+<div class="main" ng-include="templateImprimir">
+
+</div><!-- /main -->
+
+<script type="text/ng-template" id="imprimirIndex.html">
+
+    <div class="flex-align">
+
+        <div class="content">
+
+            <div class="entry">
+
+                <h1>¡Agrega tus fotos!</h1>
+
+                <button class="btn-icon"
+                        ngf-select="addFiles($files, $invalidFiles)"
+                        multiple
+                        accept="image/*"
+                        ngf-max-size="1GB"
+                        ngf-keep="false"
+                        ngf-max-height="10000"
+                        ngf-max-width="10000">
+                    <svg class="icon icon-xl color-primary" height="36" viewBox="0 0 24 24" width="36" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>
+                    </svg>
+                </button>
+
+
+            </div><!-- /entry -->
+
+        </div><!-- /content -->
+
+    </div><!-- /flex-align -->
+
+</script>
+
+<script type="text/ng-template" id="imprimirAdd.html">
+
+
+    <!-- GRID -->
+    <section class="grid">
+
+
+        <!-- BUTTON UPLOAD -->
+        <div class="grid-item">
+            <div class="gi-content">
+                <button class="grid-btn"
+                        ngf-select="addFiles($files, $invalidFiles)"
+                        multiple
+                        accept="image/*"
+                        ngf-max-size="1GB"
+                        ngf-keep="false"
+                        ngf-max-height="10000"
+                        ngf-max-width="10000"
+                        ngf-fix-orientation="false">
+                    <svg class="icon" height="36" viewBox="0 0 24 24" width="36" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>
+                    </svg>
+                </button>
+            </div>
+        </div><!-- /grid-item -->
+
+
+        <div class="grid-item grid-image" ng-repeat="f in files">
+            <button class="btn-icon" ng-click="deleteImage($index)">
+                <span class="icon icon-md ic-cancel-circle"></span>
+            </button>
+            <div class="gi-content">
+                <thumbnail file-type="image" source="{{f | ngfDataUrl}}"></thumbnail>
+            </div>
+        </div><!-- /grid-item -->
+
+
+    </section><!-- /grid -->
+
+</script>
