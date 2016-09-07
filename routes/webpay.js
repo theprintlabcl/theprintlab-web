@@ -56,10 +56,10 @@ router.use('/return', function(req, res, next) {
         console.log(_xml_data);
 
         if(!signxml.checkXml(_xml_data)){
-            console.log("XML Fima invalida");
+            console.log("webpay-response[getTransactionResult] | XML Fima invalida");
             res.redirect("/#/imprimir/webpay-error");
         }else{
-            console.log("XML Fima valida");
+            console.log("webpay-response[getTransactionResult] | XML Fima valida");
             var doc = new dom().parseFromString(_xml_data);
 
             var select = xpath.useNamespaces(
@@ -166,12 +166,12 @@ router.use('/return', function(req, res, next) {
                     console.log(_xml_data);
 
                     if(signxml.checkXml(_xml_data_ack)){
-                        console.log("XML Fima valida");
+                        console.log("webpay-response[acknowledgeTransaction] | XML Fima valida");
                         objOrden.pagada = true;
                         objOrden.save();
                         res.redirect("/#/imprimir/webpay-ok/"+buyOrder);
                     }else{
-                        console.log("XML Fima invalida");
+                        console.log("webpay-response[acknowledgeTransaction] | XML Fima invalida");
                         res.redirect("/#/imprimir/webpay-error");
                     }
                 });
@@ -228,10 +228,10 @@ router.use('/init',function(req,res,next){
         console.log(_xml_data);
 
         if(!signxml.checkXml(_xml_data)){
-            console.log("XML Fima invalida");
+            console.log("webpay-response[initTransaction] | XML Fima invalida");
             res.redirect("/#/imprimir/webpay-error");
         }
-        console.log("XML Fima valida");
+        console.log("webpay-response[initTransaction] | XML Fima valida");
 
         var doc = new dom().parseFromString(_xml_data);
 

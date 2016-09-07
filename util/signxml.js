@@ -104,8 +104,8 @@ module.exports = {
     },
     checkXml : function(xml){
 
-        console.log("checkXml");
-        console.log(xml)
+        //console.log("checkXml");
+        //console.log(xml)
 
         var tbkFolder = path.join(__dirname, '../tbk/');
         var sselect = xpath.useNamespaces(
