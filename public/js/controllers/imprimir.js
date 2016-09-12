@@ -574,13 +574,8 @@ app.controller('ImprimirWebpayCtrl', function ($scope,$rootScope,$timeout,$http,
     if(!$rootScope.upload_done){
         location.href="#/imprimir/upload";
     }
-    /*var data = {
-        orderid : $rootScope.order._id,
-        total:$rootScope.price.total
-    }*/
-
     var data = {
-        orderid : "57d6d494fe1f5e030025a732",
+        orderid : $rootScope.order._id,
         total:$rootScope.price.total
     }
     $scope.webpay_url = "";
