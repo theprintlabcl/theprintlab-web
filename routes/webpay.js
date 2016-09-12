@@ -233,25 +233,26 @@ router.use('/init',function(req,res,next){
             out.estado = "error";
             //res.redirect("/#/imprimir/webpay-error");
             res.json(out);
+        }else{
+            console.log("webpay-response[initTransaction] | XML Firma valida");
+
+            var doc = new dom().parseFromString(_xml_data);
+
+            var select = xpath.useNamespaces(
+                {
+                    "soap": "http://schemas.xmlsoap.org/soap/envelope/",
+                    "ns2": "http://service.wswebpay.webpay.transbank.com/"
+                }
+            );
+
+            var out = {};
+
+            out.estado = "ok";
+            out.token = select("//soap:Body//ns2:initTransactionResponse//return//token/text()", doc)[0].nodeValue;
+            out.tbk_url = select("//soap:Body//ns2:initTransactionResponse//return//url/text()", doc)[0].nodeValue;
+
+            res.json(out);
         }
-        console.log("webpay-response[initTransaction] | XML Firma valida");
-
-        var doc = new dom().parseFromString(_xml_data);
-
-        var select = xpath.useNamespaces(
-            {
-                "soap": "http://schemas.xmlsoap.org/soap/envelope/",
-                "ns2": "http://service.wswebpay.webpay.transbank.com/"
-            }
-        );
-
-        var out = {};
-
-        out.estado = "ok";
-        out.token = select("//soap:Body//ns2:initTransactionResponse//return//token/text()", doc)[0].nodeValue;
-        out.tbk_url = select("//soap:Body//ns2:initTransactionResponse//return//url/text()", doc)[0].nodeValue;
-
-        res.json(out);
 
     });
 
