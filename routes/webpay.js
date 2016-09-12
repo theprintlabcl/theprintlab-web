@@ -229,7 +229,10 @@ router.use('/init',function(req,res,next){
 
         if(!signxml.checkXml(_xml_data)){
             console.log("webpay-response[initTransaction] | XML Firma invalida");
-            res.redirect("/#/imprimir/webpay-error");
+            var out = {};
+            out.estado = "error";
+            //res.redirect("/#/imprimir/webpay-error");
+            res.json(out);
         }
         console.log("webpay-response[initTransaction] | XML Firma valida");
 
@@ -244,6 +247,7 @@ router.use('/init',function(req,res,next){
 
         var out = {};
 
+        out.estado = "ok";
         out.token = select("//soap:Body//ns2:initTransactionResponse//return//token/text()", doc)[0].nodeValue;
         out.tbk_url = select("//soap:Body//ns2:initTransactionResponse//return//url/text()", doc)[0].nodeValue;
 

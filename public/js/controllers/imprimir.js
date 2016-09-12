@@ -588,9 +588,13 @@ app.controller('ImprimirWebpayCtrl', function ($scope,$rootScope,$timeout,$http,
 
     $http.post('/webpay/init',data).then(function(res){
         //$rootScope.order = res.data.order;
-        $scope.webpayResponse = true;
-        $scope.webpay_url = trust(res.data.tbk_url);
-        $scope.webpay_token = res.data.token;
+        if(res.data.estado == "ok"){
+            $scope.webpayResponse = true;
+            $scope.webpay_url = trust(res.data.tbk_url);
+            $scope.webpay_token = res.data.token;
+        }else{
+            location.href="#/imprimir/webpay-error";
+        }
     });
 });
 
