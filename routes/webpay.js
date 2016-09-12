@@ -193,67 +193,81 @@ router.use('/init',function(req,res,next){
     //console.log("orderid="+orderid);
     //console.log("total="+total);
 
-    var id = res.id,
-        _t = Date.now() / 1000 | 0,
-        sessionId = id+"-"+_t;
+    orden.findById(orderid, function (err, doc){
+        if(doc==null){
 
-    signxml.setOpts("%wSTransactionType%","TR_NORMAL_WS");
-    signxml.setOpts("%commerceId%",597020000541);
-    signxml.setOpts("%buyOrder%",orderid);
-    signxml.setOpts("%sessionId%",sessionId);
-    signxml.setOpts("%returnURL%","https://app-theprintlab.herokuapp.com/webpay/return");
-    signxml.setOpts("%finalURL%","https://app-theprintlab.herokuapp.com/webpay/final");
-    signxml.setOpts("%amount%",total);
-    signxml.setOpts("%commerceCode%","597020000541");
+            var id = res.id,
+                _t = Date.now() / 1000 | 0,
+                sessionId = id+"-"+_t;
 
-    var opts = signxml.getOpts();
-    var initTransaction = signxml.parseXml("initTransaction",opts);
-    var _xml = signxml.signXml(initTransaction);
+            signxml.setOpts("%wSTransactionType%","TR_NORMAL_WS");
+            signxml.setOpts("%commerceId%",597020000541);
+            signxml.setOpts("%buyOrder%",orderid);
+            signxml.setOpts("%sessionId%",sessionId);
+            signxml.setOpts("%returnURL%","https://app-theprintlab.herokuapp.com/webpay/return");
+            signxml.setOpts("%finalURL%","https://app-theprintlab.herokuapp.com/webpay/final");
+            signxml.setOpts("%amount%",total);
+            signxml.setOpts("%commerceCode%","597020000541");
 
-    var url = 'https://webpay3gint.transbank.cl/WSWebpayTransaction/cxf/WSWebpayService?wsdl';
+            var opts = signxml.getOpts();
+            var initTransaction = signxml.parseXml("initTransaction",opts);
+            var _xml = signxml.signXml(initTransaction);
 
-    var client = new Client();
+            var url = 'https://webpay3gint.transbank.cl/WSWebpayTransaction/cxf/WSWebpayService?wsdl';
 
-    var args = {
-        data: _xml
-    };
+            var client = new Client();
 
-    console.log("webpay[initTransaction]");
-    console.log(_xml);
+            var args = {
+                data: _xml
+            };
 
-    client.post(url, args, function (data, response) {
-        var _xml_data = data.toString();
+            console.log("webpay[initTransaction]");
+            console.log(_xml);
 
-        console.log("webpay-response[initTransaction]");
-        console.log(_xml_data);
+            client.post(url, args, function (data, response) {
+                var _xml_data = data.toString();
 
-        if(!signxml.checkXml(_xml_data)){
-            console.log("webpay-response[initTransaction] | XML Firma invalida");
+                console.log("webpay-response[initTransaction]");
+                console.log(_xml_data);
+
+                if(!signxml.checkXml(_xml_data)){
+                    console.log("webpay-response[initTransaction] | XML Firma invalida");
+                    var out = {};
+                    out.estado = "error";
+                    out.mensaje = "Problemas de conexión con Transbank.";
+                    //res.redirect("/#/imprimir/webpay-error");
+                    res.json(out);
+                }else{
+                    console.log("webpay-response[initTransaction] | XML Firma valida");
+
+                    var doc = new dom().parseFromString(_xml_data);
+
+                    var select = xpath.useNamespaces(
+                        {
+                            "soap": "http://schemas.xmlsoap.org/soap/envelope/",
+                            "ns2": "http://service.wswebpay.webpay.transbank.com/"
+                        }
+                    );
+
+                    var out = {};
+
+                    out.estado = "ok";
+                    out.token = select("//soap:Body//ns2:initTransactionResponse//return//token/text()", doc)[0].nodeValue;
+                    out.tbk_url = select("//soap:Body//ns2:initTransactionResponse//return//url/text()", doc)[0].nodeValue;
+
+                    res.json(out);
+                }
+
+            });
+
+        }else{
+            console.log("webpay[initTransaction] | Orden ya existe | ordenid="+orderid);
             var out = {};
             out.estado = "error";
+            out.mensaje = "La orden "+orderid+" ya se encuentra procesada.";
             //res.redirect("/#/imprimir/webpay-error");
             res.json(out);
-        }else{
-            console.log("webpay-response[initTransaction] | XML Firma valida");
-
-            var doc = new dom().parseFromString(_xml_data);
-
-            var select = xpath.useNamespaces(
-                {
-                    "soap": "http://schemas.xmlsoap.org/soap/envelope/",
-                    "ns2": "http://service.wswebpay.webpay.transbank.com/"
-                }
-            );
-
-            var out = {};
-
-            out.estado = "ok";
-            out.token = select("//soap:Body//ns2:initTransactionResponse//return//token/text()", doc)[0].nodeValue;
-            out.tbk_url = select("//soap:Body//ns2:initTransactionResponse//return//url/text()", doc)[0].nodeValue;
-
-            res.json(out);
         }
-
     });
 
 });

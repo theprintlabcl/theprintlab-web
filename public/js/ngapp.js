@@ -54,6 +54,7 @@ var onegorillaApp = angular.module('onegorillaApp', [
 	$rootScope.pago_webpay = false;
 	$rootScope.pago_transferencia = false;
 	$rootScope.upload_done = false;
+	$rootScope.webpayerror = "";
 
 	//Global functions
 	$rootScope.updateGlobalQty = function(){
@@ -225,6 +226,9 @@ onegorillaApp.config(['$routeProvider',
 		}).
 		when('/imprimir/webpay-error', {
 			templateUrl: 'views/imprimir/webpay-error.html'
+		}).
+		when('/imprimir/webpay-error-msg', {
+			templateUrl: 'views/imprimir/webpay-error-msg.html'
 		}).
 		when('/imprimir/webpay/final', {
 			templateUrl: 'views/imprimir/webpay-final.html',
