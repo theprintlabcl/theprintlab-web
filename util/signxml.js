@@ -129,8 +129,6 @@ module.exports = {
         sig.keyInfoProvider = new FileKeyInfo(tbkFolder+"tbk.pem")
         sig.loadSignature(signature.toString())
         var res = sig.validateReferences(doc)
-		
-		res = false;
 
         return res;
 
