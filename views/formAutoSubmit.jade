@@ -1,0 +1,13 @@
+doctype html
+html
+   head(lang='en')
+      meta(charset='UTF-8')
+      title Webpay
+   body(style='visibility:hidden')
+      form#myForm(name='myForm', action='#{_REDIRECT}', method='POST')
+         input(name='token_ws', value='#{_TOKEN}')
+         input(type='submit', value='Submit')
+      script(type='text/javascript').
+         window.onload=function(){
+            setTimeout(function(){ document.forms["myForm"].submit(); }, 100);
+         }

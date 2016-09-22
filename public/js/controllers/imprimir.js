@@ -599,10 +599,9 @@ app.controller('ImprimirWebpayCtrl', function ($scope,$rootScope,$timeout,$http,
     });
 });
 
+app.controller('ImprimirWebpayErrorCtrl', function ($scope,$routeParams) {
 
-app.controller('ImprimirWebpayFinalCtrl', function ($scope,$routeParams,$http) {
-
-    console.log($routeParams)
+    $scope.orderid = $routeParams.order || "";
 
 });
 

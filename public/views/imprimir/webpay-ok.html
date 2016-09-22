@@ -35,16 +35,20 @@
                     </tr>
                     <tr>
                         <td class=TexTabColumnas>Fecha de Transacción</td>
-                        <td class=TexTabInforma>{{webpayJson.transactionDateParse | date:'dd/MM/yyyy H:mma'}}</td>
+                        <td class=TexTabInforma>{{webpayJson.trnsactionDateParse | date:'dd/MM/yyyy H:mma'}}</td>
                     </tr>
                     <tr>
                         <td class=TexTabColumnas>Tipo de Pago</td>
-                        <td class=TexTabInforma>{{webpayJson.paymentTypeCode}}</td>
+                        <td class=TexTabInforma>{{webpayJson.paymentTypeCode | tipodepago}}</td>
                     </tr>
-                    <!--<tr>
+                    <tr>
+                        <td class=TexTabColumnas>Tipo de Cuotas</td>
+                        <td class=TexTabInforma>{{webpayJson.paymentTypeCode | tipocuotas}}</td>
+                    </tr>
+                    <tr>
                         <td class=TexTabColumnas>N° de Cuotas</td>
-                        <td class=TexTabInforma>tbk_numero_cuotas</td>
-                    </tr>-->
+                        <td class=TexTabInforma>{{webpayJson.paymentTypeCode | numerocuotas}}</td>
+                    </tr>
                 </table>
 
             </div><!-- /entry -->

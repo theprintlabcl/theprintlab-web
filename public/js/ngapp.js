@@ -224,15 +224,12 @@ onegorillaApp.config(['$routeProvider',
 			templateUrl: 'views/imprimir/webpay.html',
 			controller: 'ImprimirWebpayCtrl'
 		}).
-		when('/imprimir/webpay-error', {
-			templateUrl: 'views/imprimir/webpay-error.html'
+		when('/imprimir/webpay-error/:order?', {
+			templateUrl: 'views/imprimir/webpay-error.html',
+			controller: 'ImprimirWebpayErrorCtrl'
 		}).
 		when('/imprimir/webpay-error-msg', {
 			templateUrl: 'views/imprimir/webpay-error-msg.html'
-		}).
-		when('/imprimir/webpay/final', {
-			templateUrl: 'views/imprimir/webpay-final.html',
-			controller: 'ImprimirWebpayFinalCtrl'
 		}).
 		when('/imprimir/webpay-ok/:order', {
 			templateUrl: 'views/imprimir/webpay-ok.html',
@@ -279,6 +276,82 @@ onegorillaApp.filter('miles', function(){
 
 		}
 
+	}
+});
+
+onegorillaApp.filter('tipodepago', function(){
+	return function(d){
+
+		var _r = "";
+		switch(d){
+			case "VD":
+				 _r = "Débito";
+				break;
+			case "VN":
+			case "VC":
+			case "S1":
+			case "S2":
+			case "NC":
+				_r = "Crédito"
+				break;
+		}
+		return _r;
+	}
+});
+
+onegorillaApp.filter('tipocuotas', function(){
+	return function(d){
+
+		var _r = "";
+		switch(d){
+			case "VD":
+				_r = "Venta débito";
+				break;
+			case "VN":
+				_r = "Sin cuotas";
+				break;
+			case "VC":
+				_r = "Cuotas normales";
+				break;
+			case "S1":
+				_r = "Sin interés";
+				break;
+			case "S2":
+				_r = "Sin interés";
+				break;
+			case "NC":
+				_r = "Sin interés";
+				break;
+		}
+		return _r;
+	}
+});
+
+onegorillaApp.filter('numerocuotas', function(){
+	return function(d){
+
+		var _r = "";
+		switch(d){
+			case "VD":
+				_r = "0";
+				break;
+			case "VN":
+				_r = "0";
+				break;
+			case "VC":
+				_r = "4-48";
+				break;
+			case "S1":
+				_r = "3";
+				break;
+			case "S2":
+				_r = "2";
+				break;
+			case "NC":
+				_r = "2-10";
+				break;
+		}
+		return _r;
 	}
 });
 

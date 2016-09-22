@@ -16,8 +16,17 @@ var orden = require('../models/orden.js');
 router.use('/final', function(req, res, next) {
 
     console.log("webpay-final");
-    console.log(req.body);
-    res.redirect("/#/imprimir/webpay-error");
+    var token_ws = req.body.token_ws;//req.param('token_ws');
+    console.log("webpay-final | token_ws="+token_ws);
+
+    orden.findOne({ token : token_ws}, function (err, doc){
+        if(doc==null){
+            res.redirect("/#/imprimir/webpay-error/sin-orden");
+        }else{
+            res.redirect("/#/imprimir/webpay-ok/"+doc._id);
+        }
+    });
+
 
 });
 
@@ -30,158 +39,144 @@ router.use('/return', function(req, res, next) {
 
     signxml.setOpts("%tokenInput%",token_ws);
 
-    var opts = signxml.getOpts();
-    var getTransactionResult = signxml.parseXml("getTransactionResult",opts);
-    var _xml = signxml.signXml(getTransactionResult);
-    var id = res.id;
-
-    var url = 'https://webpay3gint.transbank.cl/WSWebpayTransaction/cxf/WSWebpayService?wsdl';
-
-    // direct way
-    var client = new Client();
-
-    var args = {
-        data: _xml
-    };
-
-    console.log("webpay[getTransactionResult]");
-    console.log(_xml);
-
-    client.post(url, args, function (data, response) {
-        // parsed response body as js object
-        // raw response
-        var _xml_data = data.toString();
-
-        console.log("webpay-response[getTransactionResult]");
-        console.log(_xml_data);
-
-        if(!signxml.checkXml(_xml_data)){
-            console.log("webpay-response[getTransactionResult] | XML Firma invalida");
-            res.redirect("/#/imprimir/webpay-error");
+    orden.findOne({ token : token_ws}, function (err, objOrden){
+        if(objOrden==null){
+            res.redirect("/#/imprimir/webpay-error/sin-orden");
         }else{
-            console.log("webpay-response[getTransactionResult] | XML Firma valida");
-            var doc = new dom().parseFromString(_xml_data);
 
-            var select = xpath.useNamespaces(
-                {
-                    "soap": "http://schemas.xmlsoap.org/soap/envelope/",
-                    "ns2": "http://service.wswebpay.webpay.transbank.com/"
-                }
-            );
-            var accountingDate = select("//soap:Body//ns2:getTransactionResultResponse//return//accountingDate/text()", doc)[0].nodeValue,
-                buyOrder = select("//soap:Body//ns2:getTransactionResultResponse//return//buyOrder/text()", doc)[0].nodeValue,
-                cardNumber = select("//soap:Body//ns2:getTransactionResultResponse//return//cardDetail//cardNumber/text()", doc)[0].nodeValue,
-                detailOutput = select("//soap:Body//ns2:getTransactionResultResponse//return//detailOutput//sharesNumber/text()", doc)[0].nodeValue,
-                amount = select("//soap:Body//ns2:getTransactionResultResponse//return//detailOutput//amount/text()", doc)[0].nodeValue,
-                commerceCode = select("//soap:Body//ns2:getTransactionResultResponse//return//detailOutput//commerceCode/text()", doc)[0].nodeValue,
-                buyOrder = select("//soap:Body//ns2:getTransactionResultResponse//return//detailOutput//buyOrder/text()", doc)[0].nodeValue,
-                authorizationCode = select("//soap:Body//ns2:getTransactionResultResponse//return//detailOutput//authorizationCode/text()", doc)[0].nodeValue,
-                paymentTypeCode = select("//soap:Body//ns2:getTransactionResultResponse//return//detailOutput//paymentTypeCode/text()", doc)[0].nodeValue,
-                responseCode = select("//soap:Body//ns2:getTransactionResultResponse//return//detailOutput//responseCode/text()", doc)[0].nodeValue,
-                sessionId = select("//soap:Body//ns2:getTransactionResultResponse//return//sessionId/text()", doc)[0].nodeValue,
-                transactionDate = select("//soap:Body//ns2:getTransactionResultResponse//return//transactionDate/text()", doc)[0].nodeValue,
-                urlRedirection = select("//soap:Body//ns2:getTransactionResultResponse//return//urlRedirection/text()", doc)[0].nodeValue,
-                VCI = select("//soap:Body//ns2:getTransactionResultResponse//return//VCI/text()", doc)[0].nodeValue;
+            var opts = signxml.getOpts();
+            var getTransactionResult = signxml.parseXml("getTransactionResult",opts);
+            var _xml = signxml.signXml(getTransactionResult);
+            var id = res.id;
 
-            /*console.log("accountingDate : " + accountingDate);
-            console.log("buyOrder : " + buyOrder);
-            console.log("cardNumber : " + cardNumber);
-            console.log("detailOutput : " + detailOutput);
-            console.log("amount : " + amount);
-            console.log("commerceCode : " + commerceCode);
-            console.log("buyOrder : " + buyOrder);
-            console.log("authorizationCode : " + authorizationCode);
-            console.log("paymentTypeCode : " + paymentTypeCode);
-            console.log("responseCode : " + responseCode);
-            console.log("sessionId : " + sessionId);
-            console.log("transactionDate : " + transactionDate);
-            console.log("urlRedirection : " + urlRedirection);
-            console.log("VCI : " + VCI);*/
+            var url = 'https://webpay3gint.transbank.cl/WSWebpayTransaction/cxf/WSWebpayService?wsdl';
 
-            var transaccion = {
-                usuarioid : id,
-                accountingDate : accountingDate,
-                buyOrder : buyOrder,
-                cardNumber : cardNumber,
-                detailOutput : detailOutput,
-                amount : amount,
-                commerceCode : commerceCode,
-                buyOrder : buyOrder,
-                authorizationCode : authorizationCode,
-                paymentTypeCode : paymentTypeCode,
-                responseCode : responseCode,
-                sessionId : sessionId,
-                transactionDate : transactionDate,
-                trnsactionDateParse : Date.parse(transactionDate),
-                urlRedirection : urlRedirection,
-                VCI : VCI
-            }
+            // direct way
+            var client = new Client();
 
+            var args = {
+                data: _xml
+            };
 
+            console.log("webpay[getTransactionResult]");
+            console.log(_xml);
 
-            var objOrden = new orden();
-            objOrden._id = buyOrder;
-            objOrden.jsontbk = JSON.stringify(transaccion);
-            objOrden.save();
+            client.post(url, args, function (data, response) {
+                // parsed response body as js object
+                // raw response
+                var _xml_data = data.toString();
 
-            /*var webpayTrxFolder = path.join(__dirname, '../webpaytrx/'),
-                currentTime = new Date(),
-                month = currentTime.getMonth() + 1,
-                year = currentTime.getFullYear(),
-                rutaArchivo = webpayTrxFolder+year+"/"+month+"/",
-                rutaJson = rutaArchivo+buyOrder+".json";
+                console.log("webpay-response[getTransactionResult]");
+                console.log(_xml_data);
 
-            fse.mkdirsSync(rutaArchivo)
-            fse.writeJsonSync(rutaJson, transaccion);*/
+                if(!signxml.checkXml(_xml_data)){
+                    console.log("webpay-response[getTransactionResult] | XML Firma invalida");
+                    res.redirect("/#/imprimir/webpay-error/"+objOrden._id);
+                }else{
+                    console.log("webpay-response[getTransactionResult] | XML Firma valida");
+                    var doc = new dom().parseFromString(_xml_data);
 
+                    var select = xpath.useNamespaces(
+                        {
+                            "soap": "http://schemas.xmlsoap.org/soap/envelope/",
+                            "ns2": "http://service.wswebpay.webpay.transbank.com/"
+                        }
+                    );
+                    var accountingDate = select("//soap:Body//ns2:getTransactionResultResponse//return//accountingDate/text()", doc)[0].nodeValue,
+                        buyOrder = select("//soap:Body//ns2:getTransactionResultResponse//return//buyOrder/text()", doc)[0].nodeValue,
+                        cardNumber = select("//soap:Body//ns2:getTransactionResultResponse//return//cardDetail//cardNumber/text()", doc)[0].nodeValue,
+                        detailOutput = select("//soap:Body//ns2:getTransactionResultResponse//return//detailOutput//sharesNumber/text()", doc)[0].nodeValue,
+                        amount = select("//soap:Body//ns2:getTransactionResultResponse//return//detailOutput//amount/text()", doc)[0].nodeValue,
+                        commerceCode = select("//soap:Body//ns2:getTransactionResultResponse//return//detailOutput//commerceCode/text()", doc)[0].nodeValue,
+                        buyOrder = select("//soap:Body//ns2:getTransactionResultResponse//return//detailOutput//buyOrder/text()", doc)[0].nodeValue,
+                        authorizationCode = select("//soap:Body//ns2:getTransactionResultResponse//return//detailOutput//authorizationCode/text()", doc)[0].nodeValue,
+                        paymentTypeCode = select("//soap:Body//ns2:getTransactionResultResponse//return//detailOutput//paymentTypeCode/text()", doc)[0].nodeValue,
+                        responseCode = select("//soap:Body//ns2:getTransactionResultResponse//return//detailOutput//responseCode/text()", doc)[0].nodeValue,
+                        sessionId = select("//soap:Body//ns2:getTransactionResultResponse//return//sessionId/text()", doc)[0].nodeValue,
+                        transactionDate = select("//soap:Body//ns2:getTransactionResultResponse//return//transactionDate/text()", doc)[0].nodeValue,
+                        urlRedirection = select("//soap:Body//ns2:getTransactionResultResponse//return//urlRedirection/text()", doc)[0].nodeValue,
+                        VCI = select("//soap:Body//ns2:getTransactionResultResponse//return//VCI/text()", doc)[0].nodeValue;
 
-
-
-            if(responseCode==0){
-
-                var opts = signxml.getOpts();
-                signxml.setOpts("%tokenInput%",token_ws);
-                var acknowledgeTransaction = signxml.parseXml("acknowledgeTransaction",opts);
-                var _xml_ack = signxml.signXml(acknowledgeTransaction);
-
-                var url = 'https://webpay3gint.transbank.cl/WSWebpayTransaction/cxf/WSWebpayService?wsdl';
-
-                // direct way
-                var client = new Client();
-
-                var args = {
-                    data: _xml_ack
-                };
-
-                console.log("webpay[acknowledgeTransaction]");
-                console.log(_xml_ack);
-
-                client.post(url, args, function (data, response) {
-
-                    // parsed response body as js object
-                    // raw response
-                    var _xml_data_ack = data.toString();
-
-                    console.log("webpay-response[acknowledgeTransaction]");
-                    console.log(_xml_data);
-
-                    if(signxml.checkXml(_xml_data_ack)){
-                        console.log("webpay-response[acknowledgeTransaction] | XML Firma valida");
-                        objOrden.pagada = true;
-                        objOrden.save();
-                        res.redirect("/#/imprimir/webpay-ok/"+buyOrder);
-                    }else{
-                        console.log("webpay-response[acknowledgeTransaction] | XML Firma invalida");
-                        res.redirect("/#/imprimir/webpay-error");
+                     var transaccion = {
+                        usuarioid : id,
+                        accountingDate : accountingDate,
+                        buyOrder : buyOrder,
+                        cardNumber : cardNumber,
+                        detailOutput : detailOutput,
+                        amount : amount,
+                        commerceCode : commerceCode,
+                        buyOrder : buyOrder,
+                        authorizationCode : authorizationCode,
+                        paymentTypeCode : paymentTypeCode,
+                        responseCode : responseCode,
+                        sessionId : sessionId,
+                        transactionDate : transactionDate,
+                        trnsactionDateParse : Date.parse(transactionDate),
+                        urlRedirection : urlRedirection,
+                        VCI : VCI
                     }
-                });
 
-            }else{
-                res.redirect("/#/imprimir/webpay-error");
-            }
+
+                    objOrden.jsontbk = JSON.stringify(transaccion);
+                    objOrden.save();
+
+
+                    var opts = signxml.getOpts();
+                    signxml.setOpts("%tokenInput%",token_ws);
+                    var acknowledgeTransaction = signxml.parseXml("acknowledgeTransaction",opts);
+                    var _xml_ack = signxml.signXml(acknowledgeTransaction);
+
+                    var url = 'https://webpay3gint.transbank.cl/WSWebpayTransaction/cxf/WSWebpayService?wsdl';
+
+                    // direct way
+                    var client = new Client();
+
+                    var args = {
+                        data: _xml_ack
+                    };
+
+                    console.log("webpay[acknowledgeTransaction]");
+                    console.log(_xml_ack);
+
+                    client.post(url, args, function (data, response) {
+
+                        // parsed response body as js object
+                        // raw response
+                        var _xml_data_ack = data.toString();
+
+                        console.log("webpay-response[acknowledgeTransaction]");
+                        console.log(_xml_data);
+
+                        if(signxml.checkXml(_xml_data_ack)){
+                            console.log("webpay-response[acknowledgeTransaction] | XML Firma valida");
+
+                            if(responseCode==0){
+                                objOrden.pagada = true;
+                                objOrden.save();
+
+                                res.render('formAutoSubmit',{_REDIRECT:urlRedirection,_TOKEN:token_ws});
+                            }else{
+                                res.redirect("/#/imprimir/webpay-error/"+buyOrder);
+                            }
+
+
+                        }else{
+                            console.log("webpay-response[acknowledgeTransaction] | XML Firma invalida");
+                            res.redirect("/#/imprimir/webpay-error/"+buyOrder);
+                        }
+                    });
+
+
+                }
+
+            });
+
+
+
         }
-
     });
+
+
 
 });
 
@@ -204,8 +199,11 @@ router.use('/init',function(req,res,next){
             signxml.setOpts("%commerceId%",597020000541);
             signxml.setOpts("%buyOrder%",orderid);
             signxml.setOpts("%sessionId%",sessionId);
+            //signxml.setOpts("%returnURL%","http://190.162.212.232:3000/webpay/return");
+            //signxml.setOpts("%finalURL%","http://190.162.212.232:3000/webpay/final");
             signxml.setOpts("%returnURL%","https://app-theprintlab.herokuapp.com/webpay/return");
             signxml.setOpts("%finalURL%","https://app-theprintlab.herokuapp.com/webpay/final");
+            //
             signxml.setOpts("%amount%",total);
             signxml.setOpts("%commerceCode%","597020000541");
 
@@ -255,6 +253,11 @@ router.use('/init',function(req,res,next){
                     out.token = select("//soap:Body//ns2:initTransactionResponse//return//token/text()", doc)[0].nodeValue;
                     out.tbk_url = select("//soap:Body//ns2:initTransactionResponse//return//url/text()", doc)[0].nodeValue;
 
+                    var objOrden = new orden();
+                    objOrden._id = orderid;
+                    objOrden.token = out.token;
+                    objOrden.save();
+
                     res.json(out);
                 }
 
@@ -284,6 +287,11 @@ router.use('/json',function(req,res,next) {
             res.send(_j);
         }
     });
+});
+
+router.use('/test',function(req,res,next) {
+
+    res.render('formAutoSubmit',{_REDIRECT:"http://google.cl",_TOKEN:"wssssssss2312313"})
 });
 
 module.exports = router;
