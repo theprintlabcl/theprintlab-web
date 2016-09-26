@@ -293,7 +293,7 @@ onegorillaApp.filter('tipodepago', function(){
 				break;
 			case "VN":
 			case "VC":
-			case "S1":
+			case "SI":
 			case "S2":
 			case "NC":
 				_r = "Crédito"
@@ -317,7 +317,7 @@ onegorillaApp.filter('tipocuotas', function(){
 			case "VC":
 				_r = "Cuotas normales";
 				break;
-			case "S1":
+			case "SI":
 				_r = "Sin interés";
 				break;
 			case "S2":
@@ -345,7 +345,7 @@ onegorillaApp.filter('numerocuotas', function(){
 			case "VC":
 				_r = "4-48";
 				break;
-			case "S1":
+			case "SI":
 				_r = "3";
 				break;
 			case "S2":
