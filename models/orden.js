@@ -6,6 +6,7 @@ var Orden = new Schema({
     pagada :  { type: Boolean, default: false },
     enviada : { type: Boolean, default: false },
     proceso : { type: Boolean, default: false },
+    monto : { type: String },
     offline_payment : { type: Boolean, default: false },
     token : { type: String, default: ""},
     jsontbk : { type: String, default: "{}" }

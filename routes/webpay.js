@@ -16,16 +16,26 @@ var orden = require('../models/orden.js');
 router.use('/final', function(req, res, next) {
 
     console.log("webpay-final");
+
     var token_ws = req.body.token_ws;//req.param('token_ws');
     console.log("webpay-final | token_ws="+token_ws);
 
-    orden.findOne({ token : token_ws}, function (err, doc){
-        if(doc==null){
-            res.redirect("/#/imprimir/webpay-error/sin-orden");
-        }else{
-            res.redirect("/#/imprimir/webpay-ok/"+doc._id);
-        }
-    });
+    if(typeof token_ws === "undefined"){
+        console.log("Pago Anulado");
+        console.log(req.body);
+        var orderid = req.body.TBK_ORDEN_COMPRA;
+        res.redirect("/#/imprimir/webpay-anulado/"+orderid);
+    }else{
+
+        orden.findOne({ token : token_ws}, function (err, doc){
+            if(doc==null){
+                res.redirect("/#/imprimir/webpay-error/sin-orden");
+            }else{
+                res.redirect("/#/imprimir/webpay-ok/"+doc._id);
+            }
+        });
+
+    }
 
 
 });
@@ -40,6 +50,8 @@ router.use('/return', function(req, res, next) {
     signxml.setOpts("%tokenInput%",token_ws);
 
     orden.findOne({ token : token_ws}, function (err, objOrden){
+        console.log("findOne")
+        console.log(objOrden)
         if(objOrden==null){
             res.redirect("/#/imprimir/webpay-error/sin-orden");
         }else{
@@ -188,8 +200,8 @@ router.use('/init',function(req,res,next){
     //console.log("orderid="+orderid);
     //console.log("total="+total);
 
-    orden.findById(orderid, function (err, doc){
-        if(doc==null){
+    orden.findById(orderid, function (err, objOrden){
+        if(objOrden==null||objOrden.pagada==false){
 
             var id = res.id,
                 _t = Date.now() / 1000 | 0,
@@ -199,10 +211,10 @@ router.use('/init',function(req,res,next){
             signxml.setOpts("%commerceId%",597020000541);
             signxml.setOpts("%buyOrder%",orderid);
             signxml.setOpts("%sessionId%",sessionId);
-            //signxml.setOpts("%returnURL%","http://190.162.212.232:3000/webpay/return");
-            //signxml.setOpts("%finalURL%","http://190.162.212.232:3000/webpay/final");
-            signxml.setOpts("%returnURL%","https://app-theprintlab.herokuapp.com/webpay/return");
-            signxml.setOpts("%finalURL%","https://app-theprintlab.herokuapp.com/webpay/final");
+            signxml.setOpts("%returnURL%","http://200.120.84.207:3000/webpay/return");
+            signxml.setOpts("%finalURL%","http://200.120.84.207:3000/webpay/final");
+            //signxml.setOpts("%returnURL%","https://app-theprintlab.herokuapp.com/webpay/return");
+            //signxml.setOpts("%finalURL%","https://app-theprintlab.herokuapp.com/webpay/final");
             //
             signxml.setOpts("%amount%",total);
             signxml.setOpts("%commerceCode%","597020000541");
@@ -253,12 +265,17 @@ router.use('/init',function(req,res,next){
                     out.token = select("//soap:Body//ns2:initTransactionResponse//return//token/text()", doc)[0].nodeValue;
                     out.tbk_url = select("//soap:Body//ns2:initTransactionResponse//return//url/text()", doc)[0].nodeValue;
 
-                    var objOrden = new orden();
-                    objOrden._id = orderid;
-                    objOrden.token = out.token;
-                    objOrden.save();
 
-                    res.json(out);
+                    orden.findById(orderid, function (err, objOrden){
+                        if(objOrden==null){
+                            var objOrden = new orden();
+                        }
+                        objOrden._id = orderid;
+                        objOrden.token = out.token;
+                        objOrden.monto = total;
+                        objOrden.save();
+                        res.json(out);
+                    });
                 }
 
             });
@@ -283,8 +300,8 @@ router.use('/json',function(req,res,next) {
         if(doc==null){
             res.send({});
         }else{
-            var _j = JSON.parse(doc.jsontbk);
-            res.send(_j);
+            //var _j = JSON.parse(doc);
+            res.send(doc);
         }
     });
 });

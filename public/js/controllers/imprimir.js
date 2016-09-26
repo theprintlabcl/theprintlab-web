@@ -605,6 +605,51 @@ app.controller('ImprimirWebpayErrorCtrl', function ($scope,$routeParams) {
 
 });
 
+app.controller('ImprimirWebpayAnuladoCtrl', function ($scope,$routeParams,$rootScope,$timeout,$http,$sce) {
+
+    $scope.orderid = $routeParams.order || "";
+    $scope.webpayResponse = false;
+
+    var data = {
+        order : $scope.orderid
+    }
+
+    var trust = function(src){
+        return $sce.trustAsResourceUrl(src);
+    }
+
+    $http.post('/webpay/json',data).then(function(res){
+        if(res.data){
+            console.log("/webpay/json");
+            console.log(res.data);
+            if(typeof res.data === "object"){
+                var orden = res.data;
+
+                var datainit = {
+                    orderid : orden._id,
+                    total:orden.monto
+                }
+
+                $scope.order = {
+                    _id : orden._id,
+                    total : orden.monto
+                }
+
+                $http.post('/webpay/init',datainit).then(function(resinit){
+                    console.log(resinit.data.estado)
+                    //$rootScope.order = res.data.order;
+                    if(resinit.data.estado == "ok"){
+                        $scope.webpayResponse = true;
+                        $scope.webpay_url = trust(resinit.data.tbk_url);
+                        $scope.webpay_token = resinit.data.token;
+                    }
+                });
+            }
+        }
+    });
+
+});
+
 app.controller('ImprimirWebpayOkCtrl', function ($scope,$routeParams,$http) {
 
     $scope.webpayJson = {};
@@ -612,16 +657,11 @@ app.controller('ImprimirWebpayOkCtrl', function ($scope,$routeParams,$http) {
     var data = {
         order : $routeParams.order
     }
-    /*var data = {
-        order : "57c3b3fff8d2870300ca2384"
-    }*/
 
     $http.post('/webpay/json',data).then(function(res){
         if(res.data){
-            console.log(res.data);
-            console.log(res.data);
             if(typeof res.data === "object"){
-                $scope.webpayJson = res.data;
+                $scope.webpayJson = angular.fromJson(res.data.jsontbk);
             }
         }
     });

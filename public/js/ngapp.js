@@ -235,6 +235,10 @@ onegorillaApp.config(['$routeProvider',
 			templateUrl: 'views/imprimir/webpay-ok.html',
 			controller: 'ImprimirWebpayOkCtrl'
 		}).
+		when('/imprimir/webpay-anulado/:order', {
+			templateUrl: 'views/imprimir/webpay-anular.html',
+			controller: 'ImprimirWebpayAnuladoCtrl'
+		}).
 		when('/imprimir/estamoslistos', {
 			templateUrl: 'views/imprimir/estamoslistos.html'
 		}).
