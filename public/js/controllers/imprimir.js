@@ -592,9 +592,11 @@ app.controller('ImprimirWebpayCtrl', function ($scope,$rootScope,$timeout,$http,
             $scope.webpayResponse = true;
             $scope.webpay_url = trust(res.data.tbk_url);
             $scope.webpay_token = res.data.token;
-        }else{
+        }else if(res.data.estado == "duplicada"){
             $rootScope.webpayerror = res.data.mensaje;
-            location.href="#/imprimir/webpay-error-msg";
+            location.href="#/imprimir/webpay-error-msg/";
+        }else{
+            location.href="#/imprimir/webpay-error/"+$rootScope.order._id;
         }
     });
 });

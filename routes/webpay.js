@@ -211,8 +211,8 @@ router.use('/init',function(req,res,next){
             signxml.setOpts("%commerceId%",597020000541);
             signxml.setOpts("%buyOrder%",orderid);
             signxml.setOpts("%sessionId%",sessionId);
-            //signxml.setOpts("%returnURL%","http://200.120.84.207:3000/webpay/return");
-            //signxml.setOpts("%finalURL%","http://200.120.84.207:3000/webpay/final");
+            //signxml.setOpts("%returnURL%","http://10.0.0.102:3000/webpay/return");
+            //signxml.setOpts("%finalURL%","http://10.0.0.102:3000/webpay/final");
             signxml.setOpts("%returnURL%","https://app-theprintlab.herokuapp.com/webpay/return");
             signxml.setOpts("%finalURL%","https://app-theprintlab.herokuapp.com/webpay/final");
             //
@@ -283,7 +283,7 @@ router.use('/init',function(req,res,next){
         }else{
             console.log("webpay[initTransaction] | Orden ya existe | ordenid="+orderid);
             var out = {};
-            out.estado = "error";
+            out.estado = "duplicada";
             out.mensaje = "La orden "+orderid+" ya se encuentra procesada.";
             //res.redirect("/#/imprimir/webpay-error");
             res.json(out);
