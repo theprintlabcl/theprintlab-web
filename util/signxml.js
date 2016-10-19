@@ -2,10 +2,9 @@ var path = require('path');
 var fs = require('fs');
 var SignedXml = require('xml-crypto').SignedXml,
     FileKeyInfo = require('xml-crypto').FileKeyInfo,
+    select = require('xml-crypto').xpath,
     dom = require('xmldom').DOMParser;
-var xpath = require('xpath');
 var x509 = require('x509');
-var Client = require('node-rest-client').Client;
 
 module.exports = {
 
@@ -104,32 +103,31 @@ module.exports = {
     },
     checkXml : function(xml){
 
-        //console.log("checkXml");
-        //console.log(xml)
-
+        var doc = new dom().parseFromString(xml)
+        var signature 	= select(doc, "//*[local-name(.)='Signature' and namespace-uri(.)='http://www.w3.org/2000/09/xmldsig#']")[0];
+        var sig = new SignedXml();
         var tbkFolder = path.join(__dirname, '../tbk/');
-        var sselect = xpath.useNamespaces(
-            {
-                "soap": "http://schemas.xmlsoap.org/soap/envelope/",
-                "ns2": "http://service.wswebpay.webpay.transbank.com/",
-                "ds": "http://www.w3.org/2000/09/xmldsig#",
-                "wsse" : "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd",
-                "wsu" : "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd",
-                "ec" : "http://www.w3.org/2001/10/xml-exc-c14n#"
-            }
-        );
-        var doc = new dom().parseFromString(xml);
-        var signature = sselect("//soap:Header//wsse:Security//ds:Signature", doc)[0]
 
-        if(typeof signature === "undefined"){
-            return false;
-        }
+        // Hack to fix TBK's non standar signature
+        // We are rewriting the method from the xml-crypto lib
+        // xml-crypto/lib/signed-xml.js line 272
+        sig.__proto__.validateSignatureValue = function() {
+            var signedInfo = select(doc, "//*[local-name(.)='SignedInfo']");
+            if (signedInfo.length==0) throw new Error("could not find SignedInfo element in the message");
+            var signedInfoCanon = this.getCanonXml([this.canonicalizationAlgorithm], signedInfo[0]);
+            // ---- BEGIN HACK ----
+            signedInfoCanon = signedInfoCanon.toString().replace("xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\"", "xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"");
+            // ---- END HACK -----
+            var signer = this.findSignatureAlgorithm(this.signatureAlgorithm);
+            var res = signer.verifySignature(signedInfoCanon, this.signingKey, this.signatureValue);
+            if (!res) this.validationErrors.push("invalid signature: the signature value " + this.signatureValue + " is incorrect");
+            return res
+        };
 
-        var sig = new SignedXml()
-        sig.keyInfoProvider = new FileKeyInfo(tbkFolder+"tbk.pem")
-        sig.loadSignature(signature.toString())
-        var res = sig.validateReferences(doc)
-
+        sig.keyInfoProvider = new FileKeyInfo(tbkFolder+"tbk.pem");
+        sig.loadSignature(signature);
+        var res = sig.checkSignature(xml);
+        if (!res) console.log(sig.validationErrors);
         return res;
 
     }

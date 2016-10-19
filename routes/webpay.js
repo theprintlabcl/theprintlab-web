@@ -24,7 +24,7 @@ router.use('/final', function(req, res, next) {
         console.log("Pago Anulado");
         console.log(req.body);
         var orderid = req.body.TBK_ORDEN_COMPRA;
-        res.redirect("/#/imprimir/webpay-anulado/"+orderid);
+        res.redirect("/#/imprimir/webpay-error/"+orderid);
     }else{
 
         orden.findOne({ token : token_ws}, function (err, doc){
@@ -308,7 +308,12 @@ router.use('/json',function(req,res,next) {
 
 router.use('/test',function(req,res,next) {
 
-    res.render('formAutoSubmit',{_REDIRECT:"http://google.cl",_TOKEN:"wssssssss2312313"})
+    var tbkFolder = path.join(__dirname, '../tbk/');
+
+    var _xml_data = fs.readFileSync(tbkFolder+'demoresponse.xml').toString();
+
+    var a = signxml.checkXml(_xml_data);
+    res.send(a);
 });
 
 module.exports = router;
