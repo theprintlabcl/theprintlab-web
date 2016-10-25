@@ -25,18 +25,22 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 app.use(function(req,res,next){
-  //console.log("Cookie");
-  //console.log(req.cookies.udid);
-  //console.log(req.cookies.id);
+
+  //Config webpay
+  // 597020000541
+  // https://webpay3gint.transbank.cl/WSWebpayTransaction/cxf/WSWebpayService?wsdl
+  res.locals.webpay = {
+    "codigoComercio" : "597032243762",
+    "urlSoap" : "https://webpay3g.transbank.cl/WSWebpayTransaction/cxf/WSWebpayService?wsdl"
+  };
+
   if (req.cookies.udid&&req.cookies.id) {
-    //console.log("Hay Cookie");
     var uid = req.cookies.udid;
     var id = req.cookies.id;
     res.udid = udid;
     res.id = id;
     next();
   }else {
-    //console.log("Creo Cookie");
     var d = new Date();
     var key = req.connection.remoteAddress + d.toLocaleTimeString();
     var hashids = new Hashids(key,32);
@@ -64,6 +68,7 @@ app.use('/webpay', webpay);
 
 //Print JADE Pretty
 app.locals.pretty = true;
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

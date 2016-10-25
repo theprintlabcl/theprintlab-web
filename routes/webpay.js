@@ -61,7 +61,7 @@ router.use('/return', function(req, res, next) {
             var _xml = signxml.signXml(getTransactionResult);
             var id = res.id;
 
-            var url = 'https://webpay3gint.transbank.cl/WSWebpayTransaction/cxf/WSWebpayService?wsdl';
+            var url = res.locals.webpay.urlSoap;
 
             // direct way
             var client = new Client();
@@ -138,7 +138,7 @@ router.use('/return', function(req, res, next) {
                     var acknowledgeTransaction = signxml.parseXml("acknowledgeTransaction",opts);
                     var _xml_ack = signxml.signXml(acknowledgeTransaction);
 
-                    var url = 'https://webpay3gint.transbank.cl/WSWebpayTransaction/cxf/WSWebpayService?wsdl';
+                    var url = res.locals.webpay.urlSoap;
 
                     // direct way
                     var client = new Client();
@@ -208,7 +208,7 @@ router.use('/init',function(req,res,next){
                 sessionId = id+"-"+_t;
 
             signxml.setOpts("%wSTransactionType%","TR_NORMAL_WS");
-            signxml.setOpts("%commerceId%",597020000541);
+            signxml.setOpts("%commerceId%",res.locals.webpay.codigoComercio);
             signxml.setOpts("%buyOrder%",orderid);
             signxml.setOpts("%sessionId%",sessionId);
             //signxml.setOpts("%returnURL%","http://10.0.0.102:3000/webpay/return");
@@ -217,13 +217,13 @@ router.use('/init',function(req,res,next){
             signxml.setOpts("%finalURL%","https://app-theprintlab.herokuapp.com/webpay/final");
             //
             signxml.setOpts("%amount%",total);
-            signxml.setOpts("%commerceCode%","597020000541");
+            signxml.setOpts("%commerceCode%",res.locals.webpay.codigoComercio);
 
             var opts = signxml.getOpts();
             var initTransaction = signxml.parseXml("initTransaction",opts);
             var _xml = signxml.signXml(initTransaction);
 
-            var url = 'https://webpay3gint.transbank.cl/WSWebpayTransaction/cxf/WSWebpayService?wsdl';
+            var url = res.locals.webpay.urlSoap;
 
             var client = new Client();
 
@@ -308,12 +308,10 @@ router.use('/json',function(req,res,next) {
 
 router.use('/test',function(req,res,next) {
 
-    var tbkFolder = path.join(__dirname, '../tbk/');
+    console.log(res);
 
-    var _xml_data = fs.readFileSync(tbkFolder+'demoresponse.xml').toString();
+    res.send(res.locals.webpay);
 
-    var a = signxml.checkXml(_xml_data);
-    res.send(a);
 });
 
 module.exports = router;
