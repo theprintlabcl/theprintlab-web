@@ -197,6 +197,8 @@ router.use('/init',function(req,res,next){
     var orderid=req.body.orderid,
         total=req.body.total;
 
+    total = 100;
+
     //console.log("orderid="+orderid);
     //console.log("total="+total);
 
