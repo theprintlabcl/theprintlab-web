@@ -139,29 +139,23 @@ app.controller('ImprimiCropCtrl', function ($scope,$rootScope,$routeParams) {
     $scope.cropfile = $rootScope.files[index];
     var anchoDiv = angular.element(".photo-item").width(),
         anchoImagen = $scope.cropfile.$ngfWidth,
-        altoImagen = $scope.cropfile.$ngfHeight,
-        newAncho = 0,
-        newAlto = 0;
+        altoImagen = $scope.cropfile.$ngfHeight;
 
 
     switch(true){
         case (anchoImagen==altoImagen):
                 $scope.canvas = {
-                    "width" : anchoDiv,
-                    "height" : anchoDiv
+                    "width" : anchoImagen,
+                    "height" : anchoImagen
                 };
-                newAncho = anchoImagen;
-                newAlto = altoImagen;
             break;
         case (anchoImagen>altoImagen):
         case (anchoImagen<altoImagen):
-                var height = Math.round((anchoDiv/3)*2);
+                var height = Math.round((anchoImagen/3)*2);
                 $scope.canvas = {
-                    "width" : anchoDiv,
+                    "width" : anchoImagen,
                     "height" : height
                 };
-                newAncho = anchoImagen;
-                newAlto = Math.round((anchoImagen/3)*2);
             break;
     }
 

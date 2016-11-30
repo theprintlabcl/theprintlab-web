@@ -6,6 +6,8 @@ module.exports = {
     config : {
         //URL Api
         _apiUrl : "https://theprintlab-dev.herokuapp.com",
+        _apiUser : "admin",
+        _apiPassword : "tpl2014admin",
         //Methods
         _getClient : '/v2/clients/{CLIENT_ID}',
         _registerClient : '/v2/clients',
@@ -17,7 +19,8 @@ module.exports = {
         _submitOrder : '/v1/orders/submit',
         _cancelOrder : '/v2/orders/{ORDER_ID}/cancel',
         _getCoupon : '/v2/clients/{CLIENT_ID}/coupons',
-        _redeemCoupon : '/v1/coupons/redeem'
+        _redeemCoupon : '/v1/coupons/redeem',
+        _ordersPayment : '/v1/orders/payment/{ORDER_ID}/{ACTION}'
     },
 
     apiGet : function(uri){
@@ -38,15 +41,16 @@ module.exports = {
         return deferred.promise;
     },
 
-    apiPost : function(uri,data){
+    apiPost : function(uri,data,auth){
         var deferred = q.defer(),
-            data = data || {};
+            data = data || {},
+            auth = auth || null;
         console.log("POST ["+uri+"]");
         console.log("--DATA--");
         console.log(data);
         console.log("--/DATA--");
         try{
-            request.post({url:uri, form:data}, function (error, response, body) {
+            request.post({url:uri, form:data, auth:auth}, function (error, response, body) {
                 if(error){
                     throw new Error(error);
                 }
@@ -193,7 +197,28 @@ module.exports = {
         return deferred.promise;
     },
 
-    submitOrder : function(){
+    submitOrder : function(orderid,photos,offline_payment){
+
+        var deferred = q.defer(),
+            _submitOrder = this.config._submitOrder,
+            uri = this.config._apiUrl+_submitOrder;
+
+        var order = {
+            _id : orderid,
+            photos : photos
+        }
+        var data = {
+            order : order,
+            offline_payment : offline_payment
+        }
+
+        this.apiPost(uri,data).then(function(r){
+            deferred.resolve(r);
+        },function(e){
+            deferred.reject(e);
+        });
+
+        return deferred.promise;
 
     },
 
@@ -240,6 +265,34 @@ module.exports = {
         console.log(data);
 
         this.apiPost(uri,data).then(function(r){
+            console.log(r);
+            deferred.resolve(r);
+        },function(e){
+            console.log("ERROR");
+            console.log(e);
+            deferred.reject(e);
+        });
+
+        return deferred.promise;
+
+    },
+
+    setOrderPayment : function(orderid,action,transaccion){
+
+        transaccion = transaccion || null;
+
+        var deferred = q.defer(),
+            _ordersPayment = this.config._ordersPayment.replace("{ORDER_ID}",orderid),
+            _ordersPayment =  _ordersPayment.replace("{ACTION}",action),
+            uri = this.config._apiUrl+_ordersPayment;
+
+        console.log(uri);
+
+        var auth = {
+            user: this.config._apiUser,
+            password: this.config._apiPassword
+        }
+        this.apiPost(uri,{payment_data:transaccion},auth).then(function(r){
             console.log(r);
             deferred.resolve(r);
         },function(e){

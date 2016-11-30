@@ -8,6 +8,14 @@ var x509 = require('x509');
 
 module.exports = {
 
+    /**
+     * crea los xml para la api de TBK
+     * @method parseXml
+     * @param {string} type - Tipo de XML
+     * @param {array} opt - Valores a reemplazar
+     * @return {string} XML
+     */
+
     parseXml : function(type,opt){
 
         opt = opt || [];
@@ -42,6 +50,14 @@ module.exports = {
 
         return _xml;
     },
+
+    /**
+     * firma con el certificado server.pem el xml para enviar a TBK
+     * @method parseXml
+     * @param {string} xml - XML
+     * @return {string} XML
+     */
+
     signXml : function(xml){
 
         var tbkFolder = path.join(__dirname, '../tbk/');
@@ -101,6 +117,12 @@ module.exports = {
     clearOpts : function(){
         this._tempArr = [];
     },
+    /**
+     * validacion xml desde TBK
+     * @method parseXml
+     * @param {string} xml - XML
+     * @return {bool} Validacion
+     */
     checkXml : function(xml){
 
         var doc = new dom().parseFromString(xml)

@@ -29,10 +29,16 @@ app.use(function(req,res,next){
   //Config webpay
   // 597020000541
   // https://webpay3gint.transbank.cl/WSWebpayTransaction/cxf/WSWebpayService?wsdl
-  res.locals.webpay = {
+  /*res.locals.webpay = {
     "codigoComercio" : "597032243762",
     "urlSoap" : "https://webpay3g.transbank.cl/WSWebpayTransaction/cxf/WSWebpayService?wsdl"
+  };*/
+
+  res.locals.webpay = {
+    "codigoComercio" : "597020000541",
+    "urlSoap" : "https://webpay3gint.transbank.cl/WSWebpayTransaction/cxf/WSWebpayService?wsdl"
   };
+
 
   if (req.cookies.udid&&req.cookies.id) {
     var uid = req.cookies.udid;

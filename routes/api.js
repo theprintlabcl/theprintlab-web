@@ -4,15 +4,19 @@ var multiparty = require('connect-multiparty'),
     multipartyMiddleware = multiparty();
 var printlab = require('../util/printlab');
 var localidad = require('../util/localidad');
-var dom = require('xmldom').DOMParser;
-var xpath = require('xpath');
-var Client = require('node-rest-client').Client;
-var signxml = require('../util/signxml');
 var fse = require('fs-extra');
 var path = require('path');
 var foto = require('../models/foto.js');
 var orden = require('../models/orden.js');
+var request = require('request');
+var fs = require('fs');
+var q = require('q');
 
+/**
+ * get /api/regiones
+ * @uri /api/regiones
+ * @return {json} regiones
+ */
 router.get('/regiones', function(req, res, next) {
 
     var regiones = localidad.getRegiones();
@@ -20,6 +24,12 @@ router.get('/regiones', function(req, res, next) {
 
 });
 
+/**
+ * get /api/provincias/:id
+ * @uri /api/provincias/:id
+ * @param {int} id - ID Region consultada
+ * @return {json} provincias
+ */
 router.get('/provincias/:id', function(req, res, next) {
 
     var region = req.params.id;
@@ -28,6 +38,13 @@ router.get('/provincias/:id', function(req, res, next) {
 
 });
 
+
+/**
+ * get /api/comunas/:id
+ * @uri /api/comunas/:id
+ * @param {int} id - ID Provincia consultada
+ * @return {json} comunas
+ */
 router.get('/comunas/:id', function(req, res, next) {
 
     var provincia = req.params.id;
@@ -36,7 +53,12 @@ router.get('/comunas/:id', function(req, res, next) {
 
 });
 
-
+/**
+ * obtiene informacion del usuario; si no existe el id consultado se creara un cliente nuevo
+ * @uri /api/client
+ * @param {int} id - ID Provincia consultada
+ * @return {json} comunas
+ */
 router.get('/client', function(req, res, next) {
 
     var id = res.id;
@@ -65,6 +87,14 @@ router.get('/client', function(req, res, next) {
 
 });
 
+/**
+ * actualiza informacion del cliente
+ * @uri /api/client
+ * @param {string} id - Client ID
+ * @param {string} email - Client email
+ * @param {string} mobile - Client mobile
+ * @return {json} Response API _updateClient Printlab
+ */
 router.post('/client', function(req, res, next) {
 
     var id = res.id,
@@ -79,6 +109,13 @@ router.post('/client', function(req, res, next) {
 
 });
 
+/**
+ * registra direccion
+ * @uri /api/addresses
+ * @param {string} id - Client ID
+ * @param {json} address - Client address
+ * @return {json} Response API _registerAddress Printlab
+ */
 router.post('/addresses',function(req,res,next){
 
     var id = res.id,
@@ -92,9 +129,15 @@ router.post('/addresses',function(req,res,next){
 
 });
 
+/**
+ * obtiene direccion consultada
+ * @uri /api/addresses/:id
+ * @param {string} id - Address ID
+ * @return {json} Response API _getAddresses Printlab
+ */
 router.get('/addresses/:id',function(req,res,next){
 
-    var id = req.params.id;;
+    var id = req.params.id;
 
     printlab.getAddresses(id).then(function(ra){
         res.send(ra);
@@ -104,6 +147,12 @@ router.get('/addresses/:id',function(req,res,next){
 
 });
 
+/**
+ * elimina direccion
+ * @uri /api/addresses/:id
+ * @param {string} id - Address ID
+ * @return {json} Response API _getAddresses Printlab
+ */
 router.delete('/addresses/:id',function(req,res,next){
 
     var id = req.params.id;
@@ -116,6 +165,20 @@ router.delete('/addresses/:id',function(req,res,next){
 
 });
 
+/**
+ * crea una orden
+ * @uri /api/orders/create
+ * @param {string} id - Client ID
+ * @param {string} id - Address ID
+ * @param {int} photo_count
+ * @param {int} cost_printing
+ * @param {int} cost_shipping
+ * @param {int} cost_total
+ * @param {bool} gift
+ * @param {string} verbose
+ * @param {string} coupon_code
+ * @return {json} Response API _createOrder Printlab
+ */
 router.post('/orders/create',function(req,res,next){
 
     var id = res.id;
@@ -139,14 +202,28 @@ router.post('/orders/create',function(req,res,next){
 
 });
 
+/**
+ * sube la imagenes a Google Storage; completa la orden;
+ * -Si offline_payment == true llamara al metodo _submitOrder de Printlab
+ * -Si offline_payment != true el proceso solo subira las imagenes a Google Storage, la orden se completara al momento de terminar la compra con webpay
+ * @uri /api/orders/create
+ * @param {string} id - Client ID
+ * @param {string} id - Address ID
+ * @param {int} photo_count
+ * @param {int} cost_printing
+ * @param {int} cost_shipping
+ * @param {int} cost_total
+ * @param {bool} gift
+ * @param {string} verbose
+ * @param {string} coupon_code
+ * @return {json} Response API _createOrder Printlab
+ */
 router.post('/orders/submit',multipartyMiddleware,function(req,res,next){
     var order = req.body.order,
         infofiles = req.body.infofiles,
         offline_payment = req.body.offline_payment;
 
-    var ordersFolder = path.join(__dirname, '../orders/'),
-        myOrderFolder = ordersFolder+order+"/";
-
+    //Crear en MongoDB para utilizar informacion en webpay/return
     if(!offline_payment){
         var objOrden = new orden();
         objOrden.offline_payment = true;
@@ -154,9 +231,11 @@ router.post('/orders/submit',multipartyMiddleware,function(req,res,next){
         objOrden.save();
     }
 
-    fse.mkdirsSync(myOrderFolder);
+    var upload_storage = function(_f){
 
-    for(var _f in req.files.file){
+        console.log("upload_storage",_f)
+
+        var deferred = q.defer();
 
         var _ext = "";
         switch (_f.type) {
@@ -175,23 +254,78 @@ router.post('/orders/submit',multipartyMiddleware,function(req,res,next){
                 break;
         }
 
-        var _filetemp = req.files.file[_f],
-            _name = _filetemp.name,
-            _imagen = myOrderFolder+_name+_ext;
-        fse.move(_filetemp.path, _imagen, function (err) {
-            if (err) return console.error(err)
+        var _name = _f.name,
+            _imagen = _name+_ext;
 
+
+        var gs_uri = 'https://www.googleapis.com/upload/storage/v1/b/theprintlab-photos/o?uploadType=media&name='+_imagen+'&key=AIzaSyB1jrDremiJYKjqyBirBkcp2bYKxWqXtSE';
+
+        request({
+            method: 'POST',
+            uri: gs_uri,
+            multipart: [
+                {
+                    'content-type': _f.type,
+                    body: fs.createReadStream( _f.path )
+                }
+            ]
+        },
+        function (error, response, body) {
+            if (error) {
+                return console.error('upload failed:', error);
+            }
+            var json_body = JSON.parse(body);
+            console.log('Upload successful! ' + json_body.name);
+
+            var _obj_photo = [];
+            _obj_photo["file_name"] = json_body.name;
+            _obj_photo["qty"] = infofiles[_name];
+
+            //Crear en MongoDB para utilizar informacion en webpay/return
             var objFoto = new foto();
             objFoto.order = order;
-            objFoto.imagen = _name+_ext;
+            objFoto.imagen = json_body.name;
             objFoto.qty = infofiles[_name];
             objFoto.save();
-        })
+
+            deferred.resolve(_obj_photo);
+
+        });
+
+        return deferred.promise;
+
     }
 
-    res.send("OK");
+    var _files = req.files.file;
+
+    q.all(_files.map(upload_storage)).then(function(photos){
+
+        if(offline_payment){
+
+            console.log("array photos",photos);
+
+            printlab.submitOrder(order,photos,offline_payment).then(function(rc){
+                console.log("submitOrder",rc);
+                res.send("OK");
+            },function(err){
+                res.send(err);
+            });
+
+        }else{
+            res.send("OK");
+        }
+    })
+
+
 });
 
+/**
+ * canjear cupon
+ * @uri /api/coupons/redeem
+ * @param {string} id - Client ID
+ * @param {string} coupon_code
+ * @return {json} Response API _redeemCoupon Printlab
+ */
 router.post('/coupons/redeem',function(req,res,next){
 
     var id = res.id;
@@ -204,6 +338,12 @@ router.post('/coupons/redeem',function(req,res,next){
     })
 });
 
+/**
+ * lista los cupones del usuario
+ * @uri /api/coupons/redeem
+ * @param {string} id - Client ID
+ * @return {json} Response API _getCoupon Printlab
+ */
 router.post('/coupons',function(req,res,next){
 
     var id = res.id;
@@ -213,66 +353,6 @@ router.post('/coupons',function(req,res,next){
     },function(err){
         res.send(err);
     })
-});
-
-/*
-
-    WEBPAY
-
- */
-
-router.use('/webpay',function(req,res,next){
-
-    var orderid=req.body.orderid,
-        total=req.body.total;
-
-    console.log("orderid="+orderid);
-    console.log("total="+total);
-
-    signxml.setOpts("%wSTransactionType%","TR_NORMAL_WS");
-    signxml.setOpts("%commerceId%",597020000541);
-    signxml.setOpts("%buyOrder%","1001");
-    signxml.setOpts("%sessionId%","11111111111");
-    signxml.setOpts("%returnURL%","http://200.30.243.66:3000/webpay/return");
-    signxml.setOpts("%finalURL%","http://200.30.243.66:3000/webpay/final");
-    signxml.setOpts("%amount%","1990");
-    signxml.setOpts("%commerceCode%","597020000541");
-
-    var opts = signxml.getOpts();
-    var initTransaction = signxml.parseXml("initTransaction",opts);
-    var _xml = signxml.signXml(initTransaction);
-
-    var url = 'https://webpay3gint.transbank.cl/WSWebpayTransaction/cxf/WSWebpayService?wsdl';
-
-    var client = new Client();
-
-    var args = {
-        data: _xml
-    };
-
-    client.post(url, args, function (data, response) {
-        var _xml_data = data.toString();
-
-        //signxml.checkXml(_xml_data);
-
-        var doc = new dom().parseFromString(_xml_data);
-
-        var select = xpath.useNamespaces(
-            {
-                "soap": "http://schemas.xmlsoap.org/soap/envelope/",
-                "ns2": "http://service.wswebpay.webpay.transbank.com/"
-            }
-        );
-
-        var out = {};
-
-        out.token = select("//soap:Body//ns2:initTransactionResponse//return//token/text()", doc)[0].nodeValue;
-        out.tbk_url = select("//soap:Body//ns2:initTransactionResponse//return//url/text()", doc)[0].nodeValue;
-
-        res.json(out);
-
-    });
-
 });
 
 module.exports = router;

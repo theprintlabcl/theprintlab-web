@@ -11,36 +11,130 @@ var path = require('path');
 var fs = require('fs');
 var x509 = require('x509');
 var orden = require('../models/orden.js');
+var foto = require('../models/foto.js');
 
 
-router.use('/final', function(req, res, next) {
+/**
+ * iniciar flujo webpay
+ * @uri /webpay/init
+ * @param {string} orderid - Order ID
+ * @param {int} total
+ * @return {json} - Response {estado|token|tbk_url}
+ */
+router.post('/init',function(req,res,next){
 
-    console.log("webpay-final");
+    var orderid=req.body.orderid,
+        total=req.body.total;
 
-    var token_ws = req.body.token_ws;//req.param('token_ws');
-    console.log("webpay-final | token_ws="+token_ws);
+    total = 100;
 
-    if(typeof token_ws === "undefined"){
-        console.log("Pago Anulado");
-        console.log(req.body);
-        var orderid = req.body.TBK_ORDEN_COMPRA;
-        res.redirect("/#/imprimir/webpay-error/"+orderid);
-    }else{
+    //console.log("orderid="+orderid);
+    //console.log("total="+total);
 
-        orden.findOne({ token : token_ws}, function (err, doc){
-            if(doc==null){
-                res.redirect("/#/imprimir/webpay-error/sin-orden");
-            }else{
-                res.redirect("/#/imprimir/webpay-ok/"+doc._id);
-            }
-        });
+    orden.findById(orderid, function (err, objOrden){
+        if(objOrden==null||objOrden.pagada==false){
 
-    }
+            var id = res.id,
+                _t = Date.now() / 1000 | 0,
+                sessionId = id+"-"+_t;
 
+            signxml.setOpts("%wSTransactionType%","TR_NORMAL_WS");
+            signxml.setOpts("%commerceId%",res.locals.webpay.codigoComercio);
+            signxml.setOpts("%buyOrder%",orderid);
+            signxml.setOpts("%sessionId%",sessionId);
+            signxml.setOpts("%returnURL%","http://200.120.84.207:3000/webpay/return");
+            signxml.setOpts("%finalURL%","http://200.120.84.207:3000/webpay/final");
+            //signxml.setOpts("%returnURL%","https://app-theprintlab.herokuapp.com/webpay/return");
+            //signxml.setOpts("%finalURL%","https://app-theprintlab.herokuapp.com/webpay/final");
+            //
+            signxml.setOpts("%amount%",total);
+            signxml.setOpts("%commerceCode%",res.locals.webpay.codigoComercio);
+
+            var opts = signxml.getOpts();
+            var initTransaction = signxml.parseXml("initTransaction",opts);
+            var _xml = signxml.signXml(initTransaction);
+
+            var url = res.locals.webpay.urlSoap;
+
+            var client = new Client();
+
+            var args = {
+                data: _xml
+            };
+
+            console.log("webpay[initTransaction]");
+            console.log(_xml);
+
+            client.post(url, args, function (data, response) {
+                var _xml_data = data.toString();
+
+                console.log("webpay-response[initTransaction]");
+                console.log(_xml_data);
+
+                if(!signxml.checkXml(_xml_data)){
+                    console.log("webpay-response[initTransaction] | XML Firma invalida");
+                    var out = {};
+                    out.estado = "error";
+                    out.mensaje = "Problemas de conexión con Transbank.";
+                    //res.redirect("/#/imprimir/webpay-error");
+                    res.json(out);
+                }else{
+                    console.log("webpay-response[initTransaction] | XML Firma valida");
+
+                    var doc = new dom().parseFromString(_xml_data);
+
+                    var select = xpath.useNamespaces(
+                        {
+                            "soap": "http://schemas.xmlsoap.org/soap/envelope/",
+                            "ns2": "http://service.wswebpay.webpay.transbank.com/"
+                        }
+                    );
+
+                    var out = {};
+
+                    out.estado = "ok";
+                    out.token = select("//soap:Body//ns2:initTransactionResponse//return//token/text()", doc)[0].nodeValue;
+                    out.tbk_url = select("//soap:Body//ns2:initTransactionResponse//return//url/text()", doc)[0].nodeValue;
+
+
+                    orden.findById(orderid, function (err, objOrden){
+                        if(objOrden==null){
+                            var objOrden = new orden();
+                        }
+                        objOrden._id = orderid;
+                        objOrden.token = out.token;
+                        objOrden.monto = total;
+                        objOrden.save();
+
+                        printlab.setOrderPayment(orderid,"start_webpay").then(function(opsuccess){
+                            res.json(out);
+                        });
+
+
+                    });
+                }
+
+            });
+
+        }else{
+            console.log("webpay[initTransaction] | Orden ya existe | ordenid="+orderid);
+            var out = {};
+            out.estado = "duplicada";
+            out.mensaje = "La orden "+orderid+" ya se encuentra procesada.";
+            //res.redirect("/#/imprimir/webpay-error");
+            res.json(out);
+        }
+    });
 
 });
 
-router.use('/return', function(req, res, next) {
+/**
+ * return desde webpay
+ * @uri /webpay/return
+ * @param {string} token_ws - Token TBK
+ * @return {html|render} - Response formAutoSubmit; Envia al paso para imprimir el voucher TBK
+ */
+router.post('/return', function(req, res, next) {
 
     console.log("::RETURN-URL::");
 
@@ -166,7 +260,22 @@ router.use('/return', function(req, res, next) {
                                 objOrden.pagada = true;
                                 objOrden.save();
 
-                                res.render('formAutoSubmit',{_REDIRECT:urlRedirection,_TOKEN:token_ws});
+                                printlab.setOrderPayment(buyOrder,"complete",transaccion).then(function(opsuccess){
+                                    //
+                                    foto.find({order:buyOrder}, function (err, docsFotos) {
+                                        var photos = [];
+                                        docsFotos.forEach(function(recordFoto){
+                                            var _obj_photo = [];
+                                            _obj_photo["file_name"] = recordFoto.imagen;
+                                            _obj_photo["qty"] = recordFoto.qty;
+                                            photos.push(_obj_photo);
+                                        });
+                                        printlab.submitOrder(orderid,photos,false).then(function(rc){
+                                            res.render('formAutoSubmit',{_REDIRECT:urlRedirection,_TOKEN:token_ws});
+                                        });
+                                    });
+                                });
+
                             }else{
                                 res.redirect("/#/imprimir/webpay-error/"+buyOrder);
                             }
@@ -192,108 +301,49 @@ router.use('/return', function(req, res, next) {
 
 });
 
-router.use('/init',function(req,res,next){
+/**
+ * final desde webpay
+ * @uri /webpay/final
+ * CASO EXITOSO
+ * @param {string} token_ws - Token TBK
+ * CASO RECHAZO
+ * @param {string} TBK_ORDEN_COMPRA - ORDEN_COMPRA
+ *
+ * @return {response} - Redirect a APP
+ */
+router.use('/final', function(req, res, next) {
 
-    var orderid=req.body.orderid,
-        total=req.body.total;
+    console.log("webpay-final");
 
-    total = 100;
+    var token_ws = req.body.token_ws;
+    console.log("webpay-final | token_ws="+token_ws);
 
-    //console.log("orderid="+orderid);
-    //console.log("total="+total);
+    if(typeof token_ws === "undefined"){
+        console.log("Pago Anulado");
+        console.log(req.body);
+        var orderid = req.body.TBK_ORDEN_COMPRA;
+        res.redirect("/#/imprimir/webpay-error/"+orderid);
+    }else{
 
-    orden.findById(orderid, function (err, objOrden){
-        if(objOrden==null||objOrden.pagada==false){
+        orden.findOne({ token : token_ws}, function (err, doc){
+            if(doc==null){
+                res.redirect("/#/imprimir/webpay-error/sin-orden");
+            }else{
+                res.redirect("/#/imprimir/webpay-ok/"+doc._id);
+            }
+        });
 
-            var id = res.id,
-                _t = Date.now() / 1000 | 0,
-                sessionId = id+"-"+_t;
+    }
 
-            signxml.setOpts("%wSTransactionType%","TR_NORMAL_WS");
-            signxml.setOpts("%commerceId%",res.locals.webpay.codigoComercio);
-            signxml.setOpts("%buyOrder%",orderid);
-            signxml.setOpts("%sessionId%",sessionId);
-            //signxml.setOpts("%returnURL%","http://10.0.0.102:3000/webpay/return");
-            //signxml.setOpts("%finalURL%","http://10.0.0.102:3000/webpay/final");
-            signxml.setOpts("%returnURL%","https://app-theprintlab.herokuapp.com/webpay/return");
-            signxml.setOpts("%finalURL%","https://app-theprintlab.herokuapp.com/webpay/final");
-            //
-            signxml.setOpts("%amount%",total);
-            signxml.setOpts("%commerceCode%",res.locals.webpay.codigoComercio);
-
-            var opts = signxml.getOpts();
-            var initTransaction = signxml.parseXml("initTransaction",opts);
-            var _xml = signxml.signXml(initTransaction);
-
-            var url = res.locals.webpay.urlSoap;
-
-            var client = new Client();
-
-            var args = {
-                data: _xml
-            };
-
-            console.log("webpay[initTransaction]");
-            console.log(_xml);
-
-            client.post(url, args, function (data, response) {
-                var _xml_data = data.toString();
-
-                console.log("webpay-response[initTransaction]");
-                console.log(_xml_data);
-
-                if(!signxml.checkXml(_xml_data)){
-                    console.log("webpay-response[initTransaction] | XML Firma invalida");
-                    var out = {};
-                    out.estado = "error";
-                    out.mensaje = "Problemas de conexión con Transbank.";
-                    //res.redirect("/#/imprimir/webpay-error");
-                    res.json(out);
-                }else{
-                    console.log("webpay-response[initTransaction] | XML Firma valida");
-
-                    var doc = new dom().parseFromString(_xml_data);
-
-                    var select = xpath.useNamespaces(
-                        {
-                            "soap": "http://schemas.xmlsoap.org/soap/envelope/",
-                            "ns2": "http://service.wswebpay.webpay.transbank.com/"
-                        }
-                    );
-
-                    var out = {};
-
-                    out.estado = "ok";
-                    out.token = select("//soap:Body//ns2:initTransactionResponse//return//token/text()", doc)[0].nodeValue;
-                    out.tbk_url = select("//soap:Body//ns2:initTransactionResponse//return//url/text()", doc)[0].nodeValue;
-
-
-                    orden.findById(orderid, function (err, objOrden){
-                        if(objOrden==null){
-                            var objOrden = new orden();
-                        }
-                        objOrden._id = orderid;
-                        objOrden.token = out.token;
-                        objOrden.monto = total;
-                        objOrden.save();
-                        res.json(out);
-                    });
-                }
-
-            });
-
-        }else{
-            console.log("webpay[initTransaction] | Orden ya existe | ordenid="+orderid);
-            var out = {};
-            out.estado = "duplicada";
-            out.mensaje = "La orden "+orderid+" ya se encuentra procesada.";
-            //res.redirect("/#/imprimir/webpay-error");
-            res.json(out);
-        }
-    });
 
 });
 
+/**
+ * obtiene informacion transaccion webpay
+ * @uri /webpay/json
+ * @param {string} order - order
+ * @return {json} - transaccion
+ */
 router.use('/json',function(req,res,next) {
 
     var order = req.body.order;
@@ -302,18 +352,9 @@ router.use('/json',function(req,res,next) {
         if(doc==null){
             res.send({});
         }else{
-            //var _j = JSON.parse(doc);
             res.send(doc);
         }
     });
-});
-
-router.use('/test',function(req,res,next) {
-
-    console.log(res);
-
-    res.send(res.locals.webpay);
-
 });
 
 module.exports = router;
