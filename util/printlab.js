@@ -199,6 +199,9 @@ module.exports = {
 
     submitOrder : function(orderid,photos,offline_payment){
 
+        if(typeof offline_payment == "string" && offline_payment == "true") offline_payment = true;
+        if(typeof offline_payment == "string" && offline_payment == "false") offline_payment = false;
+
         var deferred = q.defer(),
             _submitOrder = this.config._submitOrder,
             uri = this.config._apiUrl+_submitOrder;
