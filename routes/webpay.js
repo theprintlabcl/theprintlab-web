@@ -269,7 +269,7 @@ router.post('/return', function(req, res, next) {
                                             _obj_photo["qty"] = recordFoto.qty;
                                             photos.push(_obj_photo);
                                         });
-                                        printlab.submitOrder(orderid,photos,false).then(function(rc){
+                                        printlab.submitOrder(buyOrder,photos,false).then(function(rc){
                                             res.render('formAutoSubmit',{_REDIRECT:urlRedirection,_TOKEN:token_ws});
                                         });
                                     });

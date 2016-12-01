@@ -222,6 +222,10 @@ router.post('/orders/submit',multipartyMiddleware,function(req,res,next){
         infofiles = req.body.infofiles,
         offline_payment = req.body.offline_payment;
 
+    if(typeof offline_payment == "string" && offline_payment == "true") offline_payment = true;
+    if(typeof offline_payment == "string" && offline_payment == "false") offline_payment = false;
+
+
     //Crear en MongoDB para utilizar informacion en webpay/return
     if(!offline_payment){
         var objOrden = new orden();
