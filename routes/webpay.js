@@ -10,8 +10,6 @@ var signxml = require('../util/signxml');
 var path = require('path');
 var orden = require('../models/orden.js');
 var foto = require('../models/foto.js');
-var urlutil = require('url');
-
 
 /**
  * iniciar flujo webpay
@@ -37,9 +35,7 @@ router.post('/init',function(req,res,next){
                 _t = Date.now() / 1000 | 0,
                 sessionId = id+"-"+_t;
 
-            var hostname = req.headers.host;
-            var pathname = urlutil.parse(req.url).pathname;
-            var uribase = req.protocol + '://' + hostname + pathname,
+            var uribase = process.env.URL_BASE || "https://app-theprintlab.herokuapp.com/",
                 urireturn = uribase+"webpay/return",
                 urifinal = uribase+"webpay/final";
 
