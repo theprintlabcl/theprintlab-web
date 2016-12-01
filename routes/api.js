@@ -98,7 +98,7 @@ router.post('/client', function(req, res, next) {
 
     var id = res.id,
         email = req.body.email || "",
-        mobile = req.body.mobile = "";
+        mobile = req.body.mobile || "";
 
     printlab.updateClient(id,email,mobile).then(function(ur){
         res.send(ur);

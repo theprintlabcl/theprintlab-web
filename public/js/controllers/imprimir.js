@@ -374,10 +374,12 @@ app.controller('ImprimiDireccionCtrl', function ($scope,$rootScope,$http,$routeP
 app.controller('ImprimiContactoCtrl', function ($scope,$rootScope,$http,$loading) {
 
     $scope.$watchGroup(['email','phone'],function(newNames, oldNames){
-        if(newNames[0]!=""&&newNames[1]!=""&&validateEmail(newNames[0])){
-            $rootScope.validcontact=true;
-        }else{
+		var newEmail = newNames[0],
+			newPhone = newNames[1].toString();
+        if( newEmail =="" || newPhone =="" || !validateEmail(newEmail) || newPhone.length < 8 ){
             $rootScope.validcontact=false;
+        }else{
+            $rootScope.validcontact=true;
         }
     });
 
@@ -391,7 +393,6 @@ app.controller('ImprimiContactoCtrl', function ($scope,$rootScope,$http,$loading
             email: $scope.email,
             mobile: $scope.phone
         };
-        console.log("updateUsuario",usuarioData);
         $http.post('/api/client',usuarioData).then(function(res){
             $loading.finish('loading');
             location.href="#/imprimir/pago";
@@ -675,4 +676,11 @@ app.controller('ImprimirWebpayOkCtrl', function ($scope,$routeParams,$http) {
         }
     });
 
+});
+
+app.controller('ImprimirGraciasCtrl', function ($scope,$rootScope) {
+	$scope.resetHome = function(){
+		$rootScope.setConfigInicial();
+		location.href="#/";
+	}
 });

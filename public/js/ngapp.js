@@ -17,44 +17,48 @@ var onegorillaApp = angular.module('onegorillaApp', [
 
 	$rootScope.$on('onBeforeUnload', function (e, confirmation) {
 		confirmation.message = "All data willl be lost.";
-		//e.preventDefault();
+		e.preventDefault();
 	});
 	$rootScope.$on('onUnload', function (e) {
 		console.log('leaving page');
 	});
 
 	//Global vars
-	$rootScope.config = {
-		baseqty : 20,
-		qtyplus : 5,
-		qtyplusprice : 1000,
-		baseqtyprice : 5000,
-		costshipping : 1500
-	};
-	$rootScope.qtypics = 0;
-	$rootScope.files = null;
-	$rootScope.errFiles = null;
-	$rootScope.warningpics = false;
-	$rootScope.maxqtypics = 20;
-	$rootScope.availablepics = 20;
-	$rootScope.price = {
-		pics : 0,
-		shipping : 0,
-		total : 0
-	};
-	$rootScope.selectedaddress = "";
-	$rootScope.addresses = [];
-	$rootScope.email = "";
-	$rootScope.phone = "";
-	$rootScope.gift = false;
-	$rootScope.message = "";
-	$rootScope.validcontact = false;
-	$rootScope.cupon = "";
-	$rootScope.order = false;
-	$rootScope.pago_webpay = false;
-	$rootScope.pago_transferencia = false;
-	$rootScope.upload_done = false;
-	$rootScope.webpayerror = "";
+	$rootScope.setConfigInicial = function(){
+		$rootScope.config = {
+			baseqty : 20,
+			qtyplus : 5,
+			qtyplusprice : 1000,
+			baseqtyprice : 5000,
+			costshipping : 1500
+		};
+		$rootScope.qtypics = 0;
+		$rootScope.files = null;
+		$rootScope.errFiles = null;
+		$rootScope.warningpics = false;
+		$rootScope.maxqtypics = 20;
+		$rootScope.availablepics = 20;
+		$rootScope.price = {
+			pics : 0,
+			shipping : 0,
+			total : 0
+		};
+		$rootScope.selectedaddress = "";
+		$rootScope.addresses = [];
+		$rootScope.email = "";
+		$rootScope.phone = "";
+		$rootScope.gift = false;
+		$rootScope.message = "";
+		$rootScope.validcontact = false;
+		$rootScope.cupon = "";
+		$rootScope.order = false;
+		$rootScope.pago_webpay = false;
+		$rootScope.pago_transferencia = false;
+		$rootScope.upload_done = false;
+		$rootScope.webpayerror = "";
+	}
+	$rootScope.setConfigInicial();
+	
 
 	//Global functions
 	$rootScope.updateGlobalQty = function(){
@@ -243,7 +247,8 @@ onegorillaApp.config(['$routeProvider',
 			templateUrl: 'views/imprimir/estamoslistos.html'
 		}).
 		when('/imprimir/gracias', {
-			templateUrl: 'views/imprimir/gracias.html'
+			templateUrl: 'views/imprimir/gracias.html',
+			controller: 'ImprimirGraciasCtrl'
 		}).
 		otherwise({
 			redirectTo: '/'
