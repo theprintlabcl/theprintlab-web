@@ -10,7 +10,7 @@ var signxml = require('../util/signxml');
 var path = require('path');
 var orden = require('../models/orden.js');
 var foto = require('../models/foto.js');
-var url = require('url');
+var urlutil = require('url');
 
 
 /**
@@ -38,7 +38,7 @@ router.post('/init',function(req,res,next){
                 sessionId = id+"-"+_t;
 
             var hostname = req.headers.host;
-            var pathname = url.parse(req.url).pathname;
+            var pathname = urlutil.parse(req.url).pathname;
             var uribase = req.protocol + '://' + hostname + pathname,
                 urireturn = uribase+"webpay/return",
                 urifinal = uribase+"webpay/final";
