@@ -386,6 +386,17 @@ app.controller('ImprimiContactoCtrl', function ($scope,$rootScope,$http,$loading
         return re.test(email);
     }
 
+    var updateUsuario = function(){
+        var usuarioData = {
+            email: $scope.email,
+            mobile: $scope.phone
+        };
+        $http.post('/api/client',usuarioData).then(function(res){
+            $loading.finish('loading');
+            location.href="#/imprimir/pago";
+        });
+    }
+
     $scope.crearOrden = function(){
 
         $loading.start('loading');
@@ -403,8 +414,9 @@ app.controller('ImprimiContactoCtrl', function ($scope,$rootScope,$http,$loading
         $http.post('/api/orders/create',data).then(function(res){
             $rootScope.order = res.data.order;
             console.log($rootScope.order)
-            $loading.finish('loading');
-            location.href="#/imprimir/pago";
+            updateUsuario();
+            //$loading.finish('loading');
+            //location.href="#/imprimir/pago";
         });
         //location.href="#/imprimir/pago";
 
