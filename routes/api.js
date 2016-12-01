@@ -4,7 +4,6 @@ var multiparty = require('connect-multiparty'),
     multipartyMiddleware = multiparty();
 var printlab = require('../util/printlab');
 var localidad = require('../util/localidad');
-var fse = require('fs-extra');
 var path = require('path');
 var foto = require('../models/foto.js');
 var orden = require('../models/orden.js');

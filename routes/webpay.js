@@ -8,10 +8,9 @@ var xpath = require('xpath');
 var Client = require('node-rest-client').Client;
 var signxml = require('../util/signxml');
 var path = require('path');
-var fs = require('fs');
-var x509 = require('x509');
 var orden = require('../models/orden.js');
 var foto = require('../models/foto.js');
+var url = require('url');
 
 
 /**
@@ -38,14 +37,18 @@ router.post('/init',function(req,res,next){
                 _t = Date.now() / 1000 | 0,
                 sessionId = id+"-"+_t;
 
+            var hostname = req.headers.host;
+            var pathname = url.parse(req.url).pathname;
+            var uribase = req.protocol + '://' + hostname + pathname,
+                urireturn = uribase+"webpay/return",
+                urifinal = uribase+"webpay/final";
+
             signxml.setOpts("%wSTransactionType%","TR_NORMAL_WS");
             signxml.setOpts("%commerceId%",res.locals.webpay.codigoComercio);
             signxml.setOpts("%buyOrder%",orderid);
             signxml.setOpts("%sessionId%",sessionId);
-            signxml.setOpts("%returnURL%","http://200.120.84.207:3000/webpay/return");
-            signxml.setOpts("%finalURL%","http://200.120.84.207:3000/webpay/final");
-            //signxml.setOpts("%returnURL%","https://app-theprintlab.herokuapp.com/webpay/return");
-            //signxml.setOpts("%finalURL%","https://app-theprintlab.herokuapp.com/webpay/final");
+            signxml.setOpts("%returnURL%",urireturn);
+            signxml.setOpts("%finalURL%",urifinal);
             //
             signxml.setOpts("%amount%",total);
             signxml.setOpts("%commerceCode%",res.locals.webpay.codigoComercio);
