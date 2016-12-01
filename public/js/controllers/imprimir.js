@@ -391,6 +391,7 @@ app.controller('ImprimiContactoCtrl', function ($scope,$rootScope,$http,$loading
             email: $scope.email,
             mobile: $scope.phone
         };
+        console.log("updateUsuario",usuarioData);
         $http.post('/api/client',usuarioData).then(function(res){
             $loading.finish('loading');
             location.href="#/imprimir/pago";
@@ -473,7 +474,7 @@ app.controller('ImprimiUploadCtrl', function ($scope,$rootScope,Upload,$timeout,
 
         animation: {
             //animateScale: true,
-            animateRotate: true
+            animateRotate: false
         }
     }
 
