@@ -15,13 +15,16 @@ var onegorillaApp = angular.module('onegorillaApp', [
 	$rootScope.id = $cookies.get("id");
 	console.log($rootScope.id);
 
-	$rootScope.$on('onBeforeUnload', function (e, confirmation) {
-		confirmation.message = "All data willl be lost.";
-		e.preventDefault();
-	});
-	$rootScope.$on('onUnload', function (e) {
-		console.log('leaving page');
-	});
+
+
+	$rootScope.beforeUnload = null;
+
+	$rootScope.setBeforeUnload = function(){
+		$rootScope.beforeUnload = $rootScope.$on('onBeforeUnload', function (e, confirmation) {
+			confirmation.message = "All data willl be lost.";
+			e.preventDefault();
+		});
+	}
 
 	//Global vars
 	$rootScope.setConfigInicial = function(){
@@ -56,6 +59,8 @@ var onegorillaApp = angular.module('onegorillaApp', [
 		$rootScope.pago_transferencia = false;
 		$rootScope.upload_done = false;
 		$rootScope.webpayerror = "";
+
+		$rootScope.setBeforeUnload();
 	}
 	$rootScope.setConfigInicial();
 	

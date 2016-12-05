@@ -307,7 +307,7 @@ router.post('/orders/submit',multipartyMiddleware,function(req,res,next){
 
             console.log("array photos",photos);
 
-            printlab.submitOrder(order,photos,offline_payment).then(function(rc){
+            printlab.submitOrder(order,photos,true).then(function(rc){
                 console.log("submitOrder",rc);
                 res.send("OK");
             },function(err){

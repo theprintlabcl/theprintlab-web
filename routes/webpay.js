@@ -23,11 +23,6 @@ router.post('/init',function(req,res,next){
     var orderid=req.body.orderid,
         total=req.body.total;
 
-    total = 100;
-
-    //console.log("orderid="+orderid);
-    //console.log("total="+total);
-
     orden.findById(orderid, function (err, objOrden){
         if(objOrden==null||objOrden.pagada==false){
 
@@ -354,6 +349,11 @@ router.use('/json',function(req,res,next) {
             res.send(doc);
         }
     });
+});
+
+
+router.use('/test',function(req,res,next) {
+    res.send(process.env.NODE_ENV)
 });
 
 module.exports = router;

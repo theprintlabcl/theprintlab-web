@@ -27,19 +27,24 @@ app.use(cookieParser());
 app.use(function(req,res,next){
 
   //Config webpay
-  // 597020000541
-  // https://webpay3gint.transbank.cl/WSWebpayTransaction/cxf/WSWebpayService?wsdl
-  /*res.locals.webpay = {
-    "codigoComercio" : "597032243762",
-    "urlSoap" : "https://webpay3g.transbank.cl/WSWebpayTransaction/cxf/WSWebpayService?wsdl"
-  };*/
+  if (app.get('env') === 'production') {
+    //Webpay produccion
+    res.locals.webpay = {
+      "codigoComercio" : "597032243762",
+      "urlSoap" : "https://webpay3g.transbank.cl/WSWebpayTransaction/cxf/WSWebpayService?wsdl"
+    };
+  }else{
+    //Webpay desarrollo
+    res.locals.webpay = {
+      "codigoComercio" : "597020000541",
+      "urlSoap" : "https://webpay3gint.transbank.cl/WSWebpayTransaction/cxf/WSWebpayService?wsdl"
+    };
+  }
 
-  res.locals.webpay = {
-    "codigoComercio" : "597020000541",
-    "urlSoap" : "https://webpay3gint.transbank.cl/WSWebpayTransaction/cxf/WSWebpayService?wsdl"
-  };
 
-
+  /*
+  * Obtiene actual udid del usuario; de lo contrario registra nuevo usuario
+  * */
   if (req.cookies.udid&&req.cookies.id) {
     var uid = req.cookies.udid;
     var id = req.cookies.id;

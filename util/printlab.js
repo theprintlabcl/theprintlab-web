@@ -63,6 +63,28 @@ module.exports = {
         return deferred.promise;
     },
 
+    apiPostJson : function(uri,data,auth){
+        var deferred = q.defer(),
+            data = data || {},
+            auth = auth || null;
+        console.log("POST ["+uri+"]");
+        console.log("--DATA--");
+        console.log(data);
+        console.log("--/DATA--");
+        try{
+            request.post({url:uri, json:data, auth:auth}, function (error, response, body) {
+                if(error){
+                    throw new Error(error);
+                }
+                deferred.resolve(body);
+            });
+        }catch (error) {
+            deferred.reject(error);
+        }
+
+        return deferred.promise;
+    },
+
     apiDelete : function(uri){
         var deferred = q.defer();
 
@@ -215,7 +237,7 @@ module.exports = {
             offline_payment : offline_payment
         }
 
-        this.apiPost(uri,data).then(function(r){
+        this.apiPostJson(uri,data).then(function(r){
             deferred.resolve(r);
         },function(e){
             deferred.reject(e);

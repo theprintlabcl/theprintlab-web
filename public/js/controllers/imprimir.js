@@ -64,6 +64,9 @@ app.controller('ImprimiResumenCtrl', function ($scope,$rootScope) {
 
     $scope.appClass = "";
 
+    if( !angular.isArray($rootScope.files) ){
+        location.href="#/imprimir/seleccion";
+    }
 
     $scope.grafico_data = {};
     $scope.grafico_option = {
@@ -122,20 +125,9 @@ app.controller('ImprimiCropCtrl', function ($scope,$rootScope,$routeParams) {
     var index = $routeParams.index;
 
     if(!angular.isArray($rootScope.files) || $rootScope.isEmpty($rootScope.files[index]) ){
-       // location.href="#/imprimir/seleccion";
+       location.href="#/imprimir/seleccion";
     }
 
-    /*var file = $rootScope.files[index];
-    var fileReader = new FileReader();
-    fileReader.onload = function(fileLoadedEvent)
-    {
-        $scope.dataUrl = fileLoadedEvent.target.result;
-        $scope.$broadcast($scope.showEvent);
-    };
-
-    fileReader.readAsDataURL(file);*/
-
-    //console.log(angular.element(angular.element(document.querySelector(".photo-item")[0]).clientWidth))
     $scope.cropfile = $rootScope.files[index];
     var anchoDiv = angular.element(".photo-item").width(),
         anchoImagen = $scope.cropfile.$ngfWidth,
@@ -260,29 +252,6 @@ app.controller('ImprimiDireccionCtrl', function ($scope,$rootScope,$http,$routeP
     $scope.region_selected = {};
     $scope.provincia_selected = {};
     $scope.comuna_selected = {};
-
-    /*if($routeParams.id){
-
-        $http.get('/api/addresses/'+$routeParams.id).then(function(res){
-            var address = res.data.address;
-            if(typeof address === "undefined"){
-                location.href="#/imprimir/datosenvio";
-            }
-
-            $scope.direccion = {
-                name : address.name,
-                last_name : address.last_name,
-                address_line1 : address.address_line1,
-                address_line2 : address.address_line2,
-                region : address.region,
-                provincia : address.provincia,
-                comuna : address.comuna
-            };
-
-        });
-
-    }*/
-
 
     $scope.regiones = [];
     $scope.provincias = [];
@@ -582,6 +551,13 @@ app.controller('ImprimirWebpayCtrl', function ($scope,$rootScope,$timeout,$http,
     if(!$rootScope.upload_done){
         location.href="#/imprimir/upload";
     }
+
+    if( typeof $rootScope.beforeUnload === "function" ){
+        $rootScope.beforeUnload();
+    }else{
+        $rootScope.beforeUnload = null;
+    }
+
     var data = {
         orderid : $rootScope.order._id,
         total:$rootScope.price.total

@@ -6,6 +6,13 @@ var SignedXml = require('xml-crypto').SignedXml,
     dom = require('xmldom').DOMParser;
 var x509 = require('x509');
 
+//Sufijo para server.key y tbk.pem
+if(process.env.NODE_ENV == "production"){
+    var sufixTbk = "production";
+}else{
+    var sufixTbk = "development";
+}
+
 module.exports = {
 
     /**
@@ -62,7 +69,7 @@ module.exports = {
 
         var tbkFolder = path.join(__dirname, '../tbk/');
         var xmlFolder = path.join(__dirname, '../xml/');
-        var _key = fs.readFileSync(tbkFolder+'server.pem');
+        var _key = fs.readFileSync(tbkFolder+sufixTbk+'_server.pem');
 
         function MyKeyInfo() {
             this.getKeyInfo = function(key) {
@@ -146,7 +153,7 @@ module.exports = {
             return res
         };
 
-        sig.keyInfoProvider = new FileKeyInfo(tbkFolder+"tbk.pem");
+        sig.keyInfoProvider = new FileKeyInfo(tbkFolder+sufixTbk+"_tbk.pem");
         sig.loadSignature(signature);
         var res = sig.checkSignature(xml);
         if (!res) console.log(sig.validationErrors);
