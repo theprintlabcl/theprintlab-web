@@ -13,7 +13,10 @@ var webpay = require('./routes/webpay');
 
 var app = express();
 
-mongoose.connect('mongodb://usprintlab:M1p4.S5Yi1#@ds019956.mlab.com:19956/heroku_pbbz9pbk');
+//mongoose.connect('mongodb://usprintlab:M1p4.S5Yi1#@ds019956.mlab.com:19956/heroku_pbbz9pbk');
+mongoose.connect(process.env.MONGODB_URI);
+
+
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
