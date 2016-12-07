@@ -261,17 +261,16 @@ router.post('/orders/submit',multipartyMiddleware,function(req,res,next){
             _imagen = _name+_ext;
 
 
-        var gs_uri = 'https://www.googleapis.com/upload/storage/v1/b/theprintlab-photos/o?uploadType=media&name='+_imagen+'&key=AIzaSyB1jrDremiJYKjqyBirBkcp2bYKxWqXtSE';
+        var gs_uri = process.env.URL_STORAGE+'o?uploadType=media&name='+_imagen+'&key='+process.env.KEY_STORAGE;
 
         request({
             method: 'POST',
             uri: gs_uri,
-            multipart: [
-                {
-                    'content-type': _f.type,
-                    body: fs.createReadStream( _f.path )
-                }
-            ]
+            headers: {
+                'content-type': _f.type
+            },
+            body : fs.createReadStream( _f.path )
+
         },
         function (error, response, body) {
             if (error) {
