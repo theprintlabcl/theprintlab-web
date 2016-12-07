@@ -1,13 +1,17 @@
 var request = require('request');
 var q = require('q');
 
+var configApiUrl = process.env.API_URL || "https://theprintlab-dev.herokuapp.com"
+    configApiUser = process.env.API_USER || "admin",
+    configApiPassword = process.env.API_PASSWORD || "tpl2014admin";
+
 module.exports = {
 
     config : {
         //URL Api
-        _apiUrl : "https://theprintlab-dev.herokuapp.com",
-        _apiUser : "admin",
-        _apiPassword : "tpl2014admin",
+        _apiUrl : configApiUrl,
+        _apiUser : configApiUser,
+        _apiPassword : configApiPassword,
         //Methods
         _getClient : '/v2/clients/{CLIENT_ID}',
         _registerClient : '/v2/clients',

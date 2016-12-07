@@ -36,3 +36,8 @@ process.env.URL_BASE
 
 ----------
 
+process.env.API_URL : URL API Printlab. Valor por defecto URL Desarrollo
+
+process.env.API_USER : USER API Printlab. Valor por defecto config Desarrollo
+
+process.env.API_PASSWORD : PASSWORD USER API Printlab. Valor por defecto config Desarrollo
