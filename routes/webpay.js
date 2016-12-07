@@ -30,7 +30,7 @@ router.post('/init',function(req,res,next){
                 _t = Date.now() / 1000 | 0,
                 sessionId = id+"-"+_t;
 
-            var uribase = process.env.URL_BASE || "https://app-theprintlab.herokuapp.com/",
+            var uribase = process.env.URL_BASE,
                 urireturn = uribase+"webpay/return",
                 urifinal = uribase+"webpay/final";
 

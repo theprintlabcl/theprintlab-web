@@ -13,7 +13,6 @@ var webpay = require('./routes/webpay');
 
 var app = express();
 
-//mongoose.connect('mongodb://usprintlab:M1p4.S5Yi1#@ds019956.mlab.com:19956/heroku_pbbz9pbk');
 mongoose.connect(process.env.MONGODB_URI);
 
 

@@ -31,13 +31,15 @@ process.env.NODE_ENV
 
 process.env.URL_BASE
 
-    Parametro utilizado para indicar la URL de la webapp a la cual se le concatenará las url enviadas a TBK (return y final). En caso de no setear esta configuración el valor por defecto es:  "https://app-theprintlab.herokuapp.com/"
+    Parametro utilizado para indicar la URL de la webapp a la cual se le concatenará las url enviadas a TBK (return y final).
 
 
 ----------
 
-process.env.API_URL : URL API Printlab. Valor por defecto URL Desarrollo
+process.env.API_URL : URL API Printlab.
 
-process.env.API_USER : USER API Printlab. Valor por defecto config Desarrollo
+process.env.API_USER : USER API Printlab.
 
-process.env.API_PASSWORD : PASSWORD USER API Printlab. Valor por defecto config Desarrollo
+process.env.API_PASSWORD : PASSWORD USER API Printlab.
+
+process.env.MONGODB_URI : MongoDB URI
