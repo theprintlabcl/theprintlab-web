@@ -29,6 +29,7 @@ module.exports = {
 
         try{
             request({url: uri}, function (error, response, body) {
+                console.log("response "+uri,body);
                 if(error){
                     throw new Error(error);
                 }
@@ -51,6 +52,7 @@ module.exports = {
         console.log("--/DATA--");
         try{
             request.post({url:uri, form:data, auth:auth}, function (error, response, body) {
+                console.log("response "+uri,body);
                 if(error){
                     throw new Error(error);
                 }
