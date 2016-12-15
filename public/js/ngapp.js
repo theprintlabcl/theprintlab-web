@@ -11,8 +11,8 @@ var onegorillaApp = angular.module('onegorillaApp', [
 
 	console.log($cookies.getAll());
 
-	$rootScope.udid = $cookies.get("udid");
-	$rootScope.id = $cookies.get("id");
+	$rootScope.udid = $cookies.get("printlab_udid");
+	$rootScope.id = $cookies.get("printlab_id");
 	console.log($rootScope.id);
 
 

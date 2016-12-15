@@ -23,8 +23,6 @@ router.post('/init',function(req,res,next){
     var orderid=req.body.orderid,
         total=req.body.total;
 
-    total = 100;
-
     orden.findById(orderid, function (err, objOrden){
         if(objOrden==null||objOrden.pagada==false){
 

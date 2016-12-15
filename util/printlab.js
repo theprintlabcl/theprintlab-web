@@ -112,7 +112,6 @@ module.exports = {
         this.apiGet(uri).then(function(r){
             deferred.resolve(r);
         },function(e){
-            console.log("ERR")
             deferred.reject(e);
         });
 

@@ -47,10 +47,10 @@ app.use(function(req,res,next){
   /*
   * Obtiene actual udid del usuario; de lo contrario registra nuevo usuario
   * */
-  if (req.cookies.udid&&req.cookies.id) {
-    var uid = req.cookies.udid;
-    var id = req.cookies.id;
-    res.udid = udid;
+  if (req.cookies.printlab_udid&&req.cookies.printlab_id) {
+    var uid = req.cookies.printlab_udid;
+    var id = req.cookies.printlab_id;
+    res.udid = uid;
     res.id = id;
     next();
   }else {
@@ -61,13 +61,13 @@ app.use(function(req,res,next){
     var expiresdate = new Date();
     var numberOfDaysToAdd = 365;
     expiresdate.setDate(expiresdate.getDate() + numberOfDaysToAdd);
-    res.cookie('udid', udid, {expires: expiresdate});
+    res.cookie('printlab_udid', udid, {expires: expiresdate});
     res.udid = udid;
     //Get ID User
     printlab.registerClient(udid).then(function(r){
       var response = JSON.parse(r),
           _id = response.client._id;
-          res.cookie('id', _id, {expires: expiresdate});
+          res.cookie('printlab_id', _id, {expires: expiresdate});
           res.id = id;
       next();
     });

@@ -149,11 +149,29 @@
             scope.maxWidth || img.width
           )).adjustCanvasDimensions(img.height, img.width, canvas);
 
-          canvas.getContext('2d')
-            .drawImage(img,
-              0, 0, img.width, img.height,
-              0, 0, canvas.width, canvas.height
+          if(scope.fit){
+
+            if(img.width > img.height){
+              img.width = img.height;
+            }
+
+            if(img.height > img.width){
+              img.height = img.width;
+            }
+
+            canvas.getContext('2d')
+                .drawImage(img,
+                ((img.width-(canvas.width)*1.5)/2), 0, img.width, img.height,
+                0, 0, canvas.width, canvas.height
             );
+          }else{
+            canvas.getContext('2d')
+                .drawImage(img,
+                0, 0, img.width, img.height,
+                0, 0, canvas.width, canvas.height
+            );
+          }
+
         });
       }, false);
 
@@ -171,9 +189,11 @@
         'scale': '=',
         'fileType': '@',
         'maxHeight': '@',
-        'maxWidth': '@'
+        'maxWidth': '@',
+        'fit': '@'
       },
       link: function (scope, element, attrs) {
+        if(typeof scope.fit === "undefined") scope.fit = false;
         var canvas = document.createElement('canvas'),
             renderer = null,
             renderFunc = function () {
