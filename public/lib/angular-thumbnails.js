@@ -149,19 +149,27 @@
             scope.maxWidth || img.width
           )).adjustCanvasDimensions(img.height, img.width, canvas);
 
-          if(scope.fit){
+          canvas.getContext('2d')
+              .drawImage(img,
+              0, 0, img.width, img.height,
+              0, 0, canvas.width, canvas.height
+          );
+
+          /*if(scope.fit){
 
             if(img.width > img.height){
               img.width = img.height;
+              var x = ((img.width-(canvas.width)*1.5)/2);
             }
 
             if(img.height > img.width){
               img.height = img.width;
+              var x = 0;
             }
 
             canvas.getContext('2d')
                 .drawImage(img,
-                ((img.width-(canvas.width)*1.5)/2), 0, img.width, img.height,
+                x, 0, img.width, img.height,
                 0, 0, canvas.width, canvas.height
             );
           }else{
@@ -170,7 +178,7 @@
                 0, 0, img.width, img.height,
                 0, 0, canvas.width, canvas.height
             );
-          }
+          }*/
 
         });
       }, false);

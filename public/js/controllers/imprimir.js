@@ -29,6 +29,10 @@ app.controller('ImprimiIndexrCtrl', function ($scope,$rootScope) {
             $rootScope.files.push(f);
         });
 
+        if(typeof $rootScope.beforeUnload !== "function"){
+            $rootScope.setBeforeUnload();
+        }
+
     }
 
     angular.element(document).ready(function () {
