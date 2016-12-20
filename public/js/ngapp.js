@@ -60,7 +60,7 @@ var onegorillaApp = angular.module('onegorillaApp', [
 		$rootScope.upload_done = false;
 		$rootScope.webpayerror = "";
 
-		$rootScope.setBeforeUnload();
+
 	}
 	$rootScope.setConfigInicial();
 	
