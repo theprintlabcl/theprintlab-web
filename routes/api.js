@@ -173,14 +173,17 @@ router.delete('/addresses/:id',function(req,res,next){
  * @param {int} cost_printing
  * @param {int} cost_shipping
  * @param {int} cost_total
- * @param {bool} gift
+ * @param {object} gift
  * @param {string} verbose
  * @param {string} coupon_code
  * @return {json} Response API _createOrder Printlab
  */
 router.post('/orders/create',function(req,res,next){
 
-    var id = res.id;
+    var id = res.id,
+        gift = req.body.gift;
+    if(typeof gift == "string" && gift == "true") gift = true;
+    if(typeof gift == "string" && gift == "false") gift = false;
     var order = {
         client : id,
         address : req.body.address,
@@ -188,7 +191,7 @@ router.post('/orders/create',function(req,res,next){
         cost_printing : req.body.cost_printing,
         cost_shipping : req.body.cost_shipping,
         cost_total : req.body.cost_total,
-        gift : req.body.gift,
+        gift : {is_gift : gift, message  : req.body.verbose},
         verbose : req.body.verbose,
         coupon_code : req.body.coupon_code
     };
