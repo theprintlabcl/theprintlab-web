@@ -90,8 +90,7 @@
             <button class="btn-icon" ng-click="deleteImage($index)">
                 <span class="icon icon-md ic-cancel-circle"></span>
             </button>
-            <div class="gi-content">
-                <thumbnail file-type="image" fit="true" max-width="188" max-height="188" source="{{f | ngfDataUrl}}"></thumbnail>
+            <div class="gi-content" ngf-thumbnail="f" ngf-size="{width: 200, quality: 0.8}" ngf-as-background="true">
             </div>
         </div><!-- /grid-item -->
 
