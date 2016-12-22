@@ -259,9 +259,9 @@ router.post('/return', function(req, res, next) {
                                     foto.find({order:buyOrder}, function (err, docsFotos) {
                                         var photos = [];
                                         docsFotos.forEach(function(recordFoto){
-                                            var _obj_photo = [];
-                                            _obj_photo["file_name"] = recordFoto.imagen;
-                                            _obj_photo["qty"] = recordFoto.qty;
+                                            var _obj_photo = {};
+                                            _obj_photo.file_name = recordFoto.imagen;
+                                            _obj_photo.qty = parseInt(recordFoto.qty);
                                             photos.push(_obj_photo);
                                         });
                                         printlab.submitOrder(buyOrder,photos,false).then(function(rc){
