@@ -282,15 +282,15 @@ router.post('/orders/submit',multipartyMiddleware,function(req,res,next){
             var json_body = JSON.parse(body);
             console.log('Upload successful! ' + json_body.name);
 
-            var _obj_photo = [];
-            _obj_photo["file_name"] = json_body.name;
-            _obj_photo["qty"] = infofiles[_name];
+            var _obj_photo = {};
+            _obj_photo.file_name = json_body.name;
+            _obj_photo.qty = infofiles[_name];
 
             //Crear en MongoDB para utilizar informacion en webpay/return
             var objFoto = new foto();
             objFoto.order = order;
             objFoto.imagen = json_body.name;
-            objFoto.qty = infofiles[_name];
+            objFoto.qty = parseInt(infofiles[_name]);
             objFoto.save();
 
             deferred.resolve(_obj_photo);
