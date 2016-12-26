@@ -356,6 +356,14 @@ app.controller('ImprimiContactoCtrl', function ($scope,$rootScope,$http,$loading
         }
     });
 
+    var gift = false,
+        message = "";
+
+    $scope.$watchGroup(['gift','message'],function(newNames, oldNames){
+        gift = newNames[0];
+        message = newNames[1];
+    });
+
     var validateEmail = function(email) {
         var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         return re.test(email);
@@ -382,10 +390,11 @@ app.controller('ImprimiContactoCtrl', function ($scope,$rootScope,$http,$loading
             cost_printing : $rootScope.price.pics,
             cost_shipping : $rootScope.price.shipping,
             cost_total : $rootScope.price.total,
-            gift : $rootScope.gift,
-            verbose : $rootScope.message,
+            gift : gift,
+            verbose : message,
             coupon_code : $rootScope.cupon
         };
+
         $http.post('/api/orders/create',data).then(function(res){
             $rootScope.order = res.data.order;
             console.log($rootScope.order)
