@@ -126,7 +126,7 @@ module.exports = {
             udid : udid
         };
 
-        this.apiPost(uri,data).then(function(r){
+        this.apiPostJson(uri,data).then(function(r){
             deferred.resolve(r);
         },function(e){
             deferred.reject(e);
