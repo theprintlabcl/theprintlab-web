@@ -66,11 +66,12 @@ app.use(function(req,res,next){
     res.udid = udid;
     //Get ID User
     printlab.registerClient(udid).then(function(r){
-      var response = JSON.parse(r),
-          _id = response.client._id;
+      var _id = r.client._id;
           res.cookie('printlab_id', _id, {expires: expiresdate});
           res.id = id;
       next();
+    }).catch(function(err){
+      next(err);
     });
   }
 
@@ -108,6 +109,7 @@ if (app.get('env') === 'development') {
 // production error handler
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
+  console.log("error",err);
   res.status(err.status || 500);
   res.render('error', {
     message: err.message,
